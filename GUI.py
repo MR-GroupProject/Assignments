@@ -20,6 +20,10 @@ class App(tk.Tk):
         self.resolution = ('1920*1080', '1680*1050')
         self.resolution_var = tk.StringVar(self)
 
+        # initialize renderer
+        self.renderers = ('A','B')
+        self.renderer_var = tk.StringVar(self)
+
         # set up variable
         self.option_var = tk.StringVar(self)
 
@@ -72,6 +76,20 @@ class App(tk.Tk):
             command = self.change_resolution
             )
         resolution_menu.grid(column=1, row=2, sticky=tk.W, **paddings)
+
+        #renderer label
+        renderer_label = ttk.Label(self, text = 'Renderer')
+        renderer_label.grid(column=0, row=3, sticky=tk.W, **paddings)
+
+        #renderer menu
+        renderer_menu = ttk.OptionMenu(
+            self,
+            self.renderer_var,
+            self.renderers[0],
+            *self.renderers,
+            command = self.change_renderer
+            )
+        renderer_menu.grid(column=1, row=3, sticky=tk.W, **paddings)
         
         # output label
         self.output_label = ttk.Label(self, foreground='red')
@@ -90,6 +108,11 @@ class App(tk.Tk):
     #change resolution
     def change_resolution(self, *args):
         print('resolution: ' + self.resolution_var.get())
+        return 0
+
+    #change renderer
+    def change_renderer(self, *args):
+        print('renderer: ' + self.renderer_var.get() )
         return 0
 
 if __name__ == "__main__":
