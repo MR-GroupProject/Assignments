@@ -1,45 +1,25 @@
 from tkinter import filedialog, messagebox
 
+from trimesh import geometry
 from trimesh import scene
 from trimesh import viewer
 
+from trimesh.scene import lighting
+
+import numpy as np
 import tkinter
 import trimesh
 
-# scene = trimesh.Scene()
-# viewer.SceneViewer(scene=scene)
+mesh = trimesh.load_mesh("D:/Codes/GitHub/Assignments/LabeledDB_new/Armadillo/282.off")
 
-def test():
-    messagebox.showinfo("Test", "Hello World!")
+window_size = np.array([1280, 720])
 
-def selectModel():
-    Filepath = filedialog.askopenfilename(filetypes=[("Mesh", ("*.off", ".ply"))], initialdir=r"./")
+light = lighting.DirectionalLight(color=[255, 255, 255, 1], intensity=0, radius=1000)
 
-    mesh = trimesh.load_mesh(Filepath)
-    mesh.show()
+camera = scene.Camera(resolution=window_size, fov=[2.0, 2.0])
 
-window = tkinter.Tk()
+Scene = trimesh.Scene(camera=camera, lights=[light])
 
-window.title("Multimedia Retrieval")
+Scene.add_geometry(mesh)
 
-window.geometry("960x540")
-
-button_showModel = tkinter.Button(
-    master=window, 
-    text="Select model", 
-    command=selectModel, 
-    height=2, 
-    width=15)
-
-button_showModel.grid(column=0, row=0, padx=10, pady=10)
-
-button_test = tkinter.Button(
-    master=window, 
-    text="Test", 
-    command=test, 
-    height=2, 
-    width=15)
-
-button_test.grid(column=0, row=1, padx=10, pady=10)
-
-window.mainloop()
+Scene.show()
