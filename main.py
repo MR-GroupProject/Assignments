@@ -22,6 +22,7 @@ def test():
     messagebox.showinfo("Test", "Hello World!")
 
 def selectModel():
+    Scene.delete_geometry(Scene.geometry)
     filePaths = filedialog.askopenfilenames(filetypes=[("Mesh", ("*.off", ".ply"))], initialdir=r"./")
 
     selectedNumber = len(filePaths)
