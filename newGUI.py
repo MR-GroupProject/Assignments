@@ -9,6 +9,7 @@ import pathlib
 
 from tkinter import *
 from tkinter import ttk
+from tkinter import filedialog, messagebox
 
 from turtle import color, onclick
 
@@ -24,6 +25,9 @@ import PIL.Image
 
 here = pathlib.Path(__file__).resolve().parent
 
+scene = trimesh.Scene()
+scene = trimesh.viewer.SceneWidget(scene)
+
 
 def create_scene():
     """
@@ -33,7 +37,7 @@ def create_scene():
     scene : trimesh.Scene
       Object with geometry
     """
-    scene = trimesh.Scene()
+    #scene = trimesh.Scene()
 
     # fuze
     geom = trimesh.load(str(here / './model.off'))
@@ -58,7 +62,7 @@ class MyTitle(glooey.Label):
 
 
 class MyButton(glooey.Button):
-    Foreground = MyLabel
+    #Foreground = MyLabel
     custom_alignment = 'fill'
 
     # More often you'd specify images for the different rollover states, but
@@ -83,7 +87,22 @@ class MyButton(glooey.Button):
         self.response = response
 
     def on_click(self, widget):
-        print(self.response)
+        if self.response == 'open':
+
+            filePaths = filedialog.askopenfilenames(filetypes=[("Mesh", ("*.off", ".ply"))], initialdir=r"./")
+
+            selectedNumber = len(filePaths)
+
+            if selectedNumber == 0:
+                return
+
+            for i in range(selectedNumber):
+                mesh = trimesh.load_mesh(filePaths[i])
+                mesh.apply_translation([i-selectedNumber/2, 0, 0])
+                scene.add_geometry(mesh)
+        else:
+            print(self.response)
+
 
 
 class Application:
@@ -105,6 +124,7 @@ class Application:
         # scene widget for changing camera location
         scene = create_scene()
         self.scene_widget1 = trimesh.viewer.SceneWidget(scene)
+
         # self.scene_widget1._angles = [np.deg2rad(45), 0, 0]
         hbox.add(self.scene_widget1)
 
