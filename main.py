@@ -1,20 +1,10 @@
 from tkinter import filedialog, messagebox
 
-from trimesh import geometry
-from trimesh import scene
 from trimesh import viewer
-
-from trimesh.scene import lighting
 
 import numpy as np
 import tkinter
 import trimesh
-
-window_size = np.array([1280, 720])
-
-light = lighting.DirectionalLight(color=[255, 255, 255, 1], intensity=0, radius=1000)
-
-camera = scene.Camera(resolution=window_size, fov=[2.0, 2.0])
 
 Scene = trimesh.Scene()
 
@@ -22,18 +12,14 @@ def test():
     messagebox.showinfo("Test", "Hello World!")
 
 def selectModel():
-    Scene.delete_geometry(Scene.geometry) # remove mesh added last time
-    filePaths = filedialog.askopenfilenames(filetypes=[("Mesh", ("*.off", ".ply"))], initialdir=r"./")
+    filePath = filedialog.askopenfilename(filetypes=[("Mesh", ("*.off", ".ply"))], initialdir=r"./")
 
-    selectedNumber = len(filePaths)
+    mesh = trimesh.load_mesh(filePath)
 
-    if selectedNumber == 0:
-        return
+    #print("vertices: ", mesh.vertices, "faces: ", mesh.faces)
+    print(mesh.metadata)
 
-    for i in range(selectedNumber):
-        mesh = trimesh.load_mesh(filePaths[i])
-        mesh.apply_translation([i-selectedNumber/2, 0, 0])
-        Scene.add_geometry(mesh)
+    Scene.add_geometry(mesh)
 
     Scene.show()
     
