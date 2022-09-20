@@ -25,7 +25,7 @@ rootdir = './LabeledDB_new'
 row = 1
 for subfold in os.listdir(rootdir):
     d = os.path.join(rootdir, subfold)
-    print(subfold)
+    #print(subfold)
     for file in os.listdir(d):
         if file.endswith('.off'):
             obj_path = os.path.join(d, file)
@@ -33,9 +33,11 @@ for subfold in os.listdir(rootdir):
             worksheet.write(row, 1, subfold)
             fp = open(obj_path)
             for i, line in enumerate(fp):
+
                 if i == 1:
                     worksheet.write(row, 2, line)
-            print(file)
+
+            #print(file)
             row += 1
  
 # Finally, close the Excel file
