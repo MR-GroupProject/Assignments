@@ -15,9 +15,13 @@ ms = pymeshlab.MeshSet()
 
 # load a new mesh in the MeshSet, and sets it as current mesh
 # the path of the mesh can be absolute or relative
-ms.load_new_mesh("E:/test1.ply")
+
+#ms.load_new_mesh("./LabeledDB_new/Ant/81.off")
+
+ms.load_new_mesh("./PLY/ant.ply")
 
 print(ms.number_meshes())
+
 
 # print the number of vertices of the current mesh
 print(ms.current_mesh().face_number())

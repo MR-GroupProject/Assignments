@@ -26,7 +26,7 @@ import PIL.Image
 here = pathlib.Path(__file__).resolve().parent
 
 scene = trimesh.Scene()
-scene = trimesh.viewer.SceneWidget(scene)
+#scene = trimesh.viewer.SceneWidget(scene)
 
 
 def create_scene():
@@ -40,7 +40,7 @@ def create_scene():
     #scene = trimesh.Scene()
 
     # fuze
-    geom = trimesh.load(str(here / './model.off'))
+    geom = trimesh.load(str(here / './LabeledDB_new/Ant/81.off'))
     transform = tf.translation_matrix([-0.1, -0.1, 0])
     scene.add_geometry(geom, transform=transform)
 
@@ -128,20 +128,9 @@ class Application:
         # self.scene_widget1._angles = [np.deg2rad(45), 0, 0]
         hbox.add(self.scene_widget1)
 
-        # scene widget for changing scene
-        #
-        '''
-        scene = trimesh.Scene()
-        geom = trimesh.path.creation.box_outline((0.6, 0.6, 0.6))
-        scene.add_geometry(geom)
-        self.scene_widget2 = trimesh.viewer.SceneWidget(scene)
-        hbox.add(self.scene_widget2)
-        '''
+
         # integrate with other widget than SceneWidget
-        '''
-        self.image_widget = glooey.Image()
-        hbox.add(self.image_widget)
-        '''
+
         note = glooey.Label(text='Note:\nRotate the view: Click mouse and drag.\nMove model: Click mouse and CTL, drag.\n Zoom in and out: Mouse wheel')
         control_pad = glooey.Grid(5,5)
         control_pad.custom_alignment = 'left'
@@ -169,30 +158,8 @@ class Application:
         pyglet.app.run()
 
     def callback(self, dt):
-        # change camera location
-        #self.scene_widget1._angles[2] += np.deg2rad(1)
-        #self.scene_widget1.scene.set_camera(self.scene_widget1._angles)
+        return
 
-        # change scene
-        '''
-        if len(self.scene_widget2.scene.graph.nodes) < 100:
-            geom = trimesh.creation.icosphere(radius=0.01)
-            geom.visual.face_colors = np.random.uniform(0, 1, (3,))
-            geom.apply_translation(np.random.uniform(-0.3, 0.3, (3,)))
-            self.scene_widget2.scene.add_geometry(geom)
-            self.scene_widget2._draw()
-        '''
-
-        # change image
-        '''
-        image = np.random.randint(0,
-                                  255,
-                                  (self.height - 10, self.width // 3 - 10, 3),
-                                  dtype=np.uint8)
-        with io.BytesIO() as f:
-            PIL.Image.fromarray(image).save(f, format='JPEG')
-            self.image_widget.image = pyglet.image.load(filename=None, file=f)
-        '''
     def _create_window(self, width, height):
         try:
             config = pyglet.gl.Config(sample_buffers=1,
