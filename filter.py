@@ -28,6 +28,8 @@ for subfold in os.listdir(rootdir):
     #print(subfold)
     for file in os.listdir(d):
         if file.endswith('.off'):
+            tri = 0
+            quad = 0
             obj_path = os.path.join(d, file)
             worksheet.write(row, 0, file)
             worksheet.write(row, 1, subfold)
@@ -35,8 +37,21 @@ for subfold in os.listdir(rootdir):
             for i, line in enumerate(fp):
 
                 if i == 1:
+                    
                     worksheet.write(row, 2, line)
 
+                if line.startswith('3 ') or line.startswith('4 '):
+                    if line.startswith('3 '):
+                        tri = 1
+                    if line.startswith('4 '):
+                        quad = 1
+                if tri == 1 and quad == 1:
+                    worksheet.write(row, 3, 'Mix')
+                    break
+            if tri == 1 and quad == 0:
+                worksheet.write(row, 3, 'Tri')
+            elif tri == 0 and quad == 1:
+                worksheet.write(row, 3, 'Quad')
             #print(file)
             row += 1
  
