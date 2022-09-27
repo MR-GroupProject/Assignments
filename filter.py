@@ -34,7 +34,7 @@ for sub_fold in os.listdir(root_dir):
             file_path = obj_path
             if file.endswith('.ply'):
                 file_path = convertor.convert_ply_into_off(obj_path)  # convert the .ply file into .off file
-
+            v, f = 0, 0
             tri = 0
             quad = 0
 
@@ -53,12 +53,13 @@ for sub_fold in os.listdir(root_dir):
                     f = int(line.split(' ')[1])
                     worksheet.write(row, 2, v)
                     worksheet.write(row, 3, f)
-                
-                elif not line.startswith('3 ') and not line.startswith('4 '):
+
+                elif v > 0:
+                    v -= v  # read lines of vertices
                     curX = float(line.split(' ')[0])
                     curY = float(line.split(' ')[1])
                     curZ = float(line.split(' ')[2])
-                    #print(curX)
+
                     if curX < minX:
                         minX = curX
                     else:
@@ -74,7 +75,9 @@ for sub_fold in os.listdir(root_dir):
                     else:
                         maxZ = curZ
 
-                else:
+                    continue
+
+                else:  # read lines of faces
                     if tri == 1 and quad == 1:
                         worksheet.write(row, 4, 'Mix')
                         break
@@ -89,8 +92,8 @@ for sub_fold in os.listdir(root_dir):
                 
                 length = maxX - minX
                 width = maxY - minY
-                heigth = maxZ - minZ
-                bBoxSize = str(length) + ' ' + str(width) + ' ' + str(heigth)
+                height = maxZ - minZ
+                bBoxSize = str(length) + ' ' + str(width) + ' ' + str(height)
                 worksheet.write(row, 5, bBoxSize)
 
             row += 1
