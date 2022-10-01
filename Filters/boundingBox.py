@@ -4,9 +4,9 @@ import pymeshlab
 
 wb = load_workbook('../filter.xlsx')
 ws = wb['Sheet1']
-ws.cell(1, ws.max_column+1).value = 'Bounding Box x'
-ws.cell(1, ws.max_column+1).value = 'Bounding Box y'
-ws.cell(1, ws.max_column+1).value = 'Bounding Box z'
+ws.cell(1, 6).value = 'Bounding Box x'
+ws.cell(1, 7).value = 'Bounding Box y'
+ws.cell(1, 8).value = 'Bounding Box z'
 
 ms = pymeshlab.MeshSet()
 
@@ -20,3 +20,5 @@ for row in range(2, ws.max_row+1):
     ms.clear()
 
 wb.save('../filter.xlsx')
+
+print('done')
