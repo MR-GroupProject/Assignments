@@ -1,9 +1,7 @@
-import trimesh
 import numpy as np
 import pymeshlab
 import os
-
-from pynput import keyboard
+import polyscope as ps
 
 def creat_bounding_box(bbox_max, bbox_min, dim_x, dim_y, dim_z):
 
@@ -33,14 +31,14 @@ def creat_bounding_box(bbox_max, bbox_min, dim_x, dim_y, dim_z):
     return
 
 
-
+ps.init()
 # create a new MeshSet
 ms = pymeshlab.MeshSet()
 
 # load a new mesh in the MeshSet, and sets it as current mesh
 # the path of the mesh can be absolute or relative
 
-ms.load_new_mesh("./LabeledDB_new/Ant/81.off")
+ms.load_new_mesh("./LabeledDB_new/Ant/82.off")
 
 
 #display the bounding box of current mesh
@@ -49,16 +47,33 @@ dim_y = ms.current_mesh().bounding_box().dim_y()
 dim_z = ms.current_mesh().bounding_box().dim_z()
 bbox_max = ms.current_mesh().bounding_box().max()
 bbox_min = ms.current_mesh().bounding_box().min()
+#create a off file to save the dounding box
 creat_bounding_box(bbox_max, bbox_min, dim_x, dim_y, dim_z)
-ms.add_mesh("bounding_box.off")
 
+#draw a bounding box by polyscope.
+bx_vertex = np.array([
+    [bbox_min[0], bbox_min[1], bbox_min[2]],
+    [bbox_min[0] + dim_x, bbox_min[1], bbox_min[2]],
+    [bbox_min[0] + dim_x, bbox_min[1] + dim_y, bbox_min[2]],
+    [bbox_min[0], bbox_min[1] + dim_y, bbox_min[2]],
+    [bbox_max[0], bbox_max[1], bbox_max[2]],
+    [bbox_max[0] - dim_x, bbox_max[1], bbox_max[2]],
+    [bbox_max[0]- dim_x, bbox_max[1] - dim_y, bbox_max[2]],
+    [bbox_max[0], bbox_max[1] - dim_y, bbox_max[2]]
+])
+bx_face = np.array([
+    [0, 1, 2, 3],
+    [4, 5, 6, 7],
+    [2, 3, 5, 4],
+    [0, 1, 7, 6],
+    [1, 2, 4, 7],
+    [0, 3, 5, 6]
+])
 
-
-#ms.generate_resampled_uniform_mesh(cellsize = pymeshlab.Percentage(1))
-#ms.generate_sampling_montecarlo(samplenum = 100)
-# print(ms.number_meshes())
-
-# print the number of vertices and faces of the current mesh
+polyscope_bounding_box = ps.register_surface_mesh('bx', bx_vertex, bx_face)
+polyscope_bounding_box.set_transparency(0.5)
+polyscope_bounding_box.set_edge_width(2)
+polyscope_bounding_box.set_color([255, 255, 255])
 '''
 print(ms.current_mesh().face_number())
 print(ms.current_mesh().vertex_number())
