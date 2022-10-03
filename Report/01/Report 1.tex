@@ -61,11 +61,28 @@
 \begin{document}
 \maketitle
 
-\section{First section}
+\section{Final Result}
 
-Your text goes here.
+This project is developed on Windows 10/11, python $\geq$ 3.6, with pymeshlab/tkinter/trimeshlab.
 
-\subsection{A subsection}
+Figure \ref{Fig.main} has two sub figures, fig. \ref{Fig.sub.1} is the travel demand of driving auto, and fig. \ref{Fig.sub.2} is the travel demand of park-and-ride.
+
+\begin{figure}[H]
+\centering  %图片全局居中
+\subfigure[name1]{
+\label{Fig.sub.1}
+\includegraphics[width=0.45\textwidth]{DV_demand}}
+\subfigure[name2]{
+\label{Fig.sub.2}
+\includegraphics[width=0.45\textwidth]{P+R_demand}}
+\caption{Main name}
+\label{Fig.main}
+\end{figure}
+\end{document}
+
+\section{Project Workflow}
+
+\section{Development Logs}
 
 More text.
 

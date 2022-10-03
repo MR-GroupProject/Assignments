@@ -22,7 +22,6 @@ def selectModel():
     Scene.add_geometry(mesh)
 
     Scene.show()
-    
 
 window = tkinter.Tk()
 

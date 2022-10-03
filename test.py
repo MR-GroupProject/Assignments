@@ -1,36 +1,17 @@
-# from tkinter import filedialog, messagebox
+import numpy as np
+import open3d as o3d
 
-# from trimesh import geometry
-# from trimesh import scene
-# from trimesh import viewer
+path = "./LabeledDB_new/Ant/82.off"
 
-# from trimesh.scene import lighting
+mesh = o3d.io.read_triangle_mesh(path)
 
-# import numpy as np
-# import tkinter
-# import trimesh
+#Normalization
+mesh.scale(1/np.max(mesh.get_max_bound() - mesh.get_min_bound()),
+           center=mesh.get_center())
 
-# mesh = trimesh.load_mesh("D:/Codes/GitHub/Assignments/LabeledDB_new/Fish/221.off")
+o3d.visualization.draw_geometries([mesh])
 
-# window_size = np.array([1280, 720])
-
-# light = lighting.DirectionalLight(color=[255, 255, 255, 1], intensity=0, radius=1000)
-
-# camera = scene.Camera(resolution=window_size, fov=[2.0, 2.0])
-
-# Scene = trimesh.Scene(camera=camera, lights=[light])
-
-# Scene.add_geometry(mesh)
-
-# mesh.show()
-
-from tkinter import *
-from OpenGL.Tk import *
-
-b=Opengl(height=100,width=100)
-root = b.master
-f = Frame(root, width=100, bg='blue')
-f.pack(side='left', fill='y')
-b.pack(side='right', expand=1, fill='both')
-
-root.mainloop()
+#Voxelization
+voxel_grid = o3d.geometry.VoxelGrid.create_from_triangle_mesh(mesh,
+                                                              voxel_size=0.05)
+o3d.visualization.draw_geometries([voxel_grid])
