@@ -5,6 +5,7 @@ import polyscope as ps
 ms = pymeshlab.MeshSet()
 ms.load_new_mesh("./LabeledDB_new/Ant/82.off")
 ms.generate_copy_of_current_mesh()
+ms.set_mesh_name(newname='mesh after rotation')
 
 
 # Parameters:
