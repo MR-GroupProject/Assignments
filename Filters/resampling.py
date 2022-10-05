@@ -32,6 +32,12 @@ def resampling(ws, ms, start_col=17):
                 ws.cell(row, start_col).value = ws.cell(row, 3).value
                 ws.cell(row, start_col + 1).value = ws.cell(row, 4).value
 
+            ms.meshing_remove_duplicate_faces()
+            ms.meshing_remove_duplicate_vertices()
+            ms.meshing_remove_folded_faces()
+            ms.meshing_repair_non_manifold_edges()
+            ms.meshing_edge_flip_by_planar_optimization()
+            ms.meshing_close_holes()
             ms.save_current_mesh("../Remesh/" + label + "/" + file)
             ms.clear()
 
