@@ -6,8 +6,6 @@ ms = pymeshlab.MeshSet()
 ms.load_new_mesh("./LabeledDB_new/Ant/82.off")
 ms.generate_copy_of_current_mesh()
 
-ps.init()
-
 
 # Parameters:
 #   cur_ms: mesh
@@ -33,14 +31,12 @@ def pca(cur_ms):
     e3 = np.cross(e1, e2)
     m = np.array([e1, e2, e3])
     m = np.mat(m)
-    result = np.dot(mesh_np, m.T)
+    # result = np.dot(mesh_np, m.T)
     m = np.insert(m, 3, [0, 0, 0], 0)
     m = np.insert(m, 3, [0, 0, 0, 1], 1)
 
     ms.set_matrix(transformmatrix=m)
-
-    ps.register_surface_mesh('new', result, faces)
-
+    # ms.save_current_mesh()
     ms.show_polyscope()
 
 
