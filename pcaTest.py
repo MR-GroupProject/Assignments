@@ -9,9 +9,7 @@ ms.generate_copy_of_current_mesh()
 
 # Parameters:
 #   cur_ms: mesh
-#   n: number of remaining dimensions
-# Return: [Feature valuse, feature vectors, lower dimensions matrix, rebuilded mesh's matrix]
-def pca(cur_ms):
+def pca_show(cur_ms):
     mesh_np = cur_ms.vertex_matrix()  # get mesh matrix
     mean_val = np.mean(mesh_np, axis=0)  # get mean of mesh's matrix
     new_mesh_np = mesh_np - mean_val  # set the mesh on new origin
@@ -40,4 +38,4 @@ def pca(cur_ms):
     ms.show_polyscope()
 
 
-pca(ms.current_mesh())
+pca_show(ms.current_mesh())

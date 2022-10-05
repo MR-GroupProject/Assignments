@@ -1,4 +1,5 @@
 from openpyxl import load_workbook
+import numpy as np
 import pymeshlab
 import os
 
@@ -40,7 +41,7 @@ def translation(ws, ms, start_col=12):
         for row in range(2, ws.max_row + 1):
             file = ws.cell(row, 1).value
             label = ws.cell(row, 2).value
-            ms.load_new_mesh("../LabeledDB_new/" + label + "/" + file)
+            ms.load_new_mesh("../Remesh/" + label + "/" + file)
             center = ms.get_geometric_measures().get('barycenter')
             x = center[0]
             y = center[1]
@@ -56,22 +57,35 @@ def translation(ws, ms, start_col=12):
             y = new_center[1]
             z = new_center[2]
             ws.cell(row, start_col + 4).value = x * x + y * y + z * z
+
+            pca(ms)
             ms.save_current_mesh("../Remesh/" + label + "/" + file)
             ms.clear()
 
 
+def pca(ms):
+    mesh_np = ms.current_mesh().vertex_matrix()  # get mesh matrix
+    # face_matrix = ms.face_matrix()
+    cov_np = np.cov(mesh_np, rowvar=False)  # calculate the covariance matrix
+    feature_val, feature_vect = np.linalg.eig(np.mat(cov_np))
+
+    feature_val_index = np.argsort(feature_val)
+    e1 = feature_vect[feature_val_index[2]]
+    e2 = feature_vect[feature_val_index[1]]
+    e3 = np.cross(e1, e2)
+    m = np.array([e1, e2, e3])
+    m = np.mat(m)
+    # result = np.dot(mesh_np, m.T)
+    m = np.insert(m, 3, [0, 0, 0], 0)
+    m = np.insert(m, 3, [0, 0, 0, 1], 1)
+
+    ms.set_matrix(transformmatrix=m)  # transform the mesh
+
+
 wb = load_workbook('../filter.xlsx')
 sheet = wb['Sheet1']
-mesh = pymeshlab.MeshSet()
+mesh_set = pymeshlab.MeshSet()
 
-# create dictionary to store mesh files after transformation
-if not os.path.exists('../Remesh'):
-    os.mkdir('../Remesh/')
-for row in range(2, sheet.max_row + 1):
-    label = sheet.cell(row, 2).value
-    if not os.path.exists('../Remesh/' + label):
-        os.mkdir('../Remesh/' + label)
-
-translation(sheet, mesh)
-bbox_scaling(sheet, mesh)
+translation(sheet, mesh_set)
+bbox_scaling(sheet, mesh_set)
 wb.save('../filter.xlsx')
