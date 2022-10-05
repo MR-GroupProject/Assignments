@@ -15,7 +15,7 @@ ms = pymeshlab.MeshSet()
 # load a new mesh in the MeshSet, and sets it as current mesh
 # the path of the mesh can be absolute or relative
 
-ms.load_new_mesh("./LabeledDB_new/Airplane/61.off")
+ms.load_new_mesh("./LabeledDB_new/Airplane/72.off")
 
 
 #display the bounding box of current mesh
@@ -36,6 +36,7 @@ PCA_value = PCA.pca(ms.current_mesh(), 3)
 new_mesh = PCA.align_to_z(PCA_value[2], PCA_value[0])
 
 ps.register_surface_mesh('new', new_mesh, mesh_face_matrix)
+
 
 '''
 print(ms.current_mesh().face_number())

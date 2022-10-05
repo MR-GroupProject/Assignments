@@ -2,7 +2,7 @@ import numpy as np
 import pymeshlab
 '''
 ms = pymeshlab.MeshSet()
-ms.load_new_mesh("./LabeledDB_new/Ant/82.off")
+ms.load_new_mesh("./LabeledDB_new/Ant/85.off")
 
 cur_ms = ms.current_mesh()
 '''
@@ -45,9 +45,15 @@ def pca(cur_ms, n):
     return [number_feature_vect, lowD_martix, new_mesh_np]
 
 # calculate the rotation matrix by feacture vector and z-axis vector
-def find_rotation_matrix(number_feature_vect):
-    a = np.array([0, 0, 1])
-    b = number_feature_vect[0]
+def find_rotation_matrix(number_feature_vect, xor):
+    if xor == 'x':
+        a = np.array([1, 0, 0])
+        b = number_feature_vect[0]
+    if xor == 'y':
+        a = np.array([0, 1, 0])
+        b = number_feature_vect[1]
+    #print(a)
+    #print(b)
     b = np.squeeze(np.asarray(b))
     v = np.cross(a, b)
     s = np.linalg.norm(v)
@@ -59,10 +65,16 @@ def find_rotation_matrix(number_feature_vect):
 # calculate the new mesh matrix after rotation_matri
 # Parameters: mesh matrix, feature vector.
 def align_to_z (new_mesh_np, number_feature_vect):
-    rotation_matrix = find_rotation_matrix(number_feature_vect)
-    print(np.shape(rotation_matrix))
-    print(np.shape(new_mesh_np))
+    rotation_matrix = find_rotation_matrix(number_feature_vect, 'x')
+    #print(np.shape(rotation_matrix))
+    #print(np.shape(new_mesh_np))
     new_mesh_np = new_mesh_np.dot(rotation_matrix)
 
+    print(number_feature_vect[1])
+    number_feature_vect[1] = number_feature_vect[1].dot(rotation_matrix) 
+    print(number_feature_vect[1])
+
+    rotation_matrix = find_rotation_matrix(number_feature_vect, 'y')
+    new_mesh_np = new_mesh_np.dot(rotation_matrix)
     return new_mesh_np
 
