@@ -1,7 +1,7 @@
 from openpyxl import load_workbook
 import numpy as np
 import pymeshlab
-import os
+import trimesh
 
 
 def bbox_scaling(ws, ms, start_col=6):
@@ -58,9 +58,35 @@ def translation(ws, ms, start_col=12):
             z = new_center[2]
             ws.cell(row, start_col + 4).value = x * x + y * y + z * z
 
+            # alignment
             pca(ms)
+
             ms.save_current_mesh("../Remesh/" + label + "/" + file)
-            ms.clear()
+            # flip test
+            flip_mesh = trimesh.load_mesh("../Remesh/" + label + "/" + file)
+            tri_center = flip_mesh.triangles_center
+            f0, f1, f2 = 0, 0, 0
+
+            for point in tri_center:
+                f0 += point[0] * point[0] * np.sign(point[0])
+                f1 += point[1] * point[1] * np.sign(point[1])
+                f2 += point[2] * point[2] * np.sign(point[2])
+
+            if f0 >= 0 and f1 >= 0 and f2 >= 0:
+                ms.clear()
+                continue
+            else:
+                print(file)
+                if f0 < 0:
+                    ms.apply_matrix_flip_or_swap_axis(flipx=True)
+                if f1 < 0:
+                    ms.apply_matrix_flip_or_swap_axis(flipy=True)
+                if f2 < 0:
+                    ms.apply_matrix_flip_or_swap_axis(flipz=True)
+                if f0 * f1 * f2 < 0:
+                    ms.meshing_invert_face_orientation()
+                ms.save_current_mesh("../Remesh/" + label + "/" + file)
+                ms.clear()
 
 
 def pca(ms):
@@ -70,8 +96,12 @@ def pca(ms):
     feature_val, feature_vect = np.linalg.eig(np.mat(cov_np))
 
     feature_val_index = np.argsort(feature_val)
-    e1 = feature_vect[feature_val_index[2]]
-    e2 = feature_vect[feature_val_index[1]]
+    number_feature_val_index = feature_val_index[-1:-4:-1]
+    number_feature_vect = feature_vect[:, number_feature_val_index]
+    number_feature_vect = number_feature_vect.T
+
+    e1 = number_feature_vect[0]
+    e2 = number_feature_vect[1]
     e3 = np.cross(e1, e2)
     m = np.array([e1, e2, e3])
     m = np.mat(m)
@@ -87,5 +117,5 @@ sheet = wb['Sheet1']
 mesh_set = pymeshlab.MeshSet()
 
 translation(sheet, mesh_set)
-bbox_scaling(sheet, mesh_set)
+#bbox_scaling(sheet, mesh_set)
 wb.save('../filter.xlsx')
