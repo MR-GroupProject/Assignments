@@ -1,40 +1,34 @@
-from pandas import DataFrame as df
-
 import math
 import matplotlib.pyplot as plt
 import numpy as np
 import open3d
 import pandas as pd
 
+def surface_area(mesh):
+    return open3d.geometry.TriangleMesh.get_surface_area(mesh)
 
-file_path = "./LabeledDB_new/Airplane/75.off"
+def volume(mesh):
+    return open3d.geometry.TriangleMesh.get_volume(mesh)
 
-mesh = open3d.io.read_triangle_mesh(file_path)
-
-vertices = np.asarray(mesh.vertices)
-triangles = np.asarray(mesh.triangles)
-
-open3d.geometry.TriangleMesh.get_surface_area(mesh)
-open3d.geometry.TriangleMesh.get_volume(mesh)
-open3d.geometry.AxisAlignedBoundingBox.get_axis_aligned_bounding_box(mesh)
+def aabb(mesh):
+    return open3d.geometry.AxisAlignedBoundingBox.get_axis_aligned_bounding_box(mesh)
 
 
-def pca(mesh, n):
-    mesh_np = mesh.vertices       # get mesh matrix
-    mean_val = np.mean(mesh_np, axis=0)    # get mean of mesh's matrix
-    new_mesh_np = mesh_np - mean_val       # set the mesh on new origin
+def pca(points, n):
+    mean_val = np.mean(points, axis=0)    # get mean of mesh's matrix
+    new_points = points - mean_val       # set the mesh on new origin
 
-    cov_np = np.cov(new_mesh_np, rowvar=0)    #calculate the covariance matrix
+    cov_np = np.cov(new_points, rowvar=0)    #calculate the covariance matrix
 
     feature_val, feature_vect = np.linalg.eig(np.mat(cov_np))
 
     feature_val_index = np.argsort(feature_val)
     number_feature_val_index = feature_val_index[-1:-(n+1):-1]
     number_feature_vect = feature_vect[:,number_feature_val_index]
-    lowD_martix = new_mesh_np * number_feature_vect
+    lowD_martix = new_points * number_feature_vect
     #rebuild_matrix = (lowD_martix * number_feature_vect.T) + mean_val
 
-    return [number_feature_vect, lowD_martix, new_mesh_np]
+    return [number_feature_vect, lowD_martix, new_points]
 
 """
 Self-implemented surface area computing
@@ -140,11 +134,4 @@ def bin(sample, low, high, n):
     x = labels
     y = [count[i] for i in labels]
     plt.plot(x, y)
-    plt.savefig("feature.png")
-
-sample = D2(vertices, 5000)
-bins = bin(sample, 0, 2, 200)
-
-
-# plt.plot()
-# plt.show()
+    # plt.savefig("feature.pdf")
