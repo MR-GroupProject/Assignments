@@ -13,6 +13,19 @@ def volume(mesh):
 def aabb(mesh):
     return open3d.geometry.AxisAlignedBoundingBox.get_axis_aligned_bounding_box(mesh)
 
+def diameter(mesh):
+    ch_mesh, ch_indeces = open3d.geometry.TriangleMesh.compute_convex_hull(mesh)
+    points = np.asarray(mesh.vertices)
+    ch_points = []
+    diameter = 0
+    for i in ch_indeces:
+        point = points[i]
+        for ch_point in ch_points:
+            distance = np.linalg.norm(point-ch_point)
+            if(distance > diameter):
+                diameter = distance
+        ch_points.append(point)
+    return diameter
 
 def pca(points, n):
     mean_val = np.mean(points, axis=0)    # get mean of mesh's matrix
@@ -68,8 +81,7 @@ def A1(points, n):
         vec1 = points[indeces[1]]-points[indeces[0]]
         vec2 = points[indeces[2]]-points[indeces[0]]
         arc = math.acos(np.dot(vec1, vec2)/(np.linalg.norm(vec1)*np.linalg.norm(vec2)))
-        sample.append(math.degrees(arc))
-    print(np.max(sample))
+        sample.append(arc/math.pi)
     return sample
 
 def D1(points, n):
@@ -80,7 +92,7 @@ def D1(points, n):
     for i in range(n):
         index = np.random.randint(l)
         distance = np.linalg.norm(points[index])
-        sample.append(distance)
+        sample.append(round(distance, 5))
     return sample
 
 def D2(points, n):
@@ -92,7 +104,7 @@ def D2(points, n):
         indeces = np.random.choice(l, 2, replace=False)
         vec = points[indeces[1]]-points[indeces[0]]
         distance = np.linalg.norm(vec)
-        sample.append(distance)
+        sample.append(round(distance/2, 5))
     return sample
 
 def D3(points, n):
@@ -100,18 +112,22 @@ def D3(points, n):
     
     sample = []
 
+    max_area = np.sqrt(3)*0.75
+
     for i in range(n):
         indeces = np.random.choice(l, 3, replace=False)
         vec1 = points[indeces[1]]-points[indeces[0]]
         vec2 = points[indeces[2]]-points[indeces[0]]
         area = np.linalg.norm(abs(np.cross(vec1, vec2))/2)
-        sample.append(area)
+        sample.append(round(area/max_area, 5))
     return sample
 
 def D4(points, n):
     l = points.shape[0]
     
     sample = []
+
+    max_volume = np.sqrt(64/243)
 
     for i in range(n):
         indeces = np.random.choice(l, 4, replace=False)
@@ -120,7 +136,7 @@ def D4(points, n):
         row2 = np.append(points[indeces[2]], 1)
         row3 = np.append(points[indeces[3]], 1)
         det = [row0, row1, row2, row3]
-        sample.append(abs(np.linalg.det(det))/6)
+        sample.append(round(abs(np.linalg.det(det))/(6*max_volume), 5))
     return sample
 
 def bin(sample, low, high, n):
