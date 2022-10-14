@@ -64,11 +64,12 @@ def A1(points, n):
     sample = []
 
     for i in range(n):
-        indeces = np.random.randint(0, l, 3)
+        indeces = np.random.choice(l, 3, replace=False)
         vec1 = points[indeces[1]]-points[indeces[0]]
         vec2 = points[indeces[2]]-points[indeces[0]]
         arc = math.acos(np.dot(vec1, vec2)/(np.linalg.norm(vec1)*np.linalg.norm(vec2)))
         sample.append(math.degrees(arc))
+    print(np.max(sample))
     return sample
 
 def D1(points, n):
@@ -77,7 +78,7 @@ def D1(points, n):
     sample = []
 
     for i in range(n):
-        index = np.random.randint(0, l)
+        index = np.random.randint(l)
         distance = np.linalg.norm(points[index])
         sample.append(distance)
     return sample
@@ -88,7 +89,7 @@ def D2(points, n):
     sample = []
 
     for i in range(n):
-        indeces = np.random.randint(0, l, 2)
+        indeces = np.random.choice(l, 2, replace=False)
         vec = points[indeces[1]]-points[indeces[0]]
         distance = np.linalg.norm(vec)
         sample.append(distance)
@@ -100,7 +101,7 @@ def D3(points, n):
     sample = []
 
     for i in range(n):
-        indeces = np.random.randint(0, l, 3)
+        indeces = np.random.choice(l, 3, replace=False)
         vec1 = points[indeces[1]]-points[indeces[0]]
         vec2 = points[indeces[2]]-points[indeces[0]]
         area = np.linalg.norm(abs(np.cross(vec1, vec2))/2)
@@ -113,11 +114,11 @@ def D4(points, n):
     sample = []
 
     for i in range(n):
-        indeces = np.random.randint(0, l, 4)
-        row0 = points[indeces[0]].append(1)
-        row1 = points[indeces[1]].append(1)
-        row2 = points[indeces[2]].append(1)
-        row3 = points[indeces[3]].append(1)
+        indeces = np.random.choice(l, 4, replace=False)
+        row0 = np.append(points[indeces[0]], 1)
+        row1 = np.append(points[indeces[1]], 1)
+        row2 = np.append(points[indeces[2]], 1)
+        row3 = np.append(points[indeces[3]], 1)
         det = [row0, row1, row2, row3]
         sample.append(abs(np.linalg.det(det))/6)
     return sample
@@ -134,4 +135,4 @@ def bin(sample, low, high, n):
     x = labels
     y = [count[i] for i in labels]
     plt.plot(x, y)
-    # plt.savefig("feature.pdf")
+
