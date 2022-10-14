@@ -57,4 +57,3 @@ for obj_type in obj_types:
     #     )
     # )
     plt.close()
-    break
