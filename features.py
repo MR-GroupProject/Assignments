@@ -1,14 +1,35 @@
+from sklearn.decomposition import PCA
+
 import math
 import matplotlib.pyplot as plt
 import numpy as np
 import open3d
 import pandas as pd
 
+
 def surface_area(mesh):
-    return open3d.geometry.TriangleMesh.get_surface_area(mesh)
+    area = 0
+    vertices = np.asarray(mesh.vertices) 
+    faces = np.asarray(mesh.triangles)
+    for face in faces:
+        a = face[0]
+        b = face[1]
+        c = face[2]
+        ba = vertices[b]-vertices[a]
+        ca = vertices[c]-vertices[a]
+        area += np.linalg.norm(np.cross(ba, ca))/2
+    return area
 
 def volume(mesh):
-    return open3d.geometry.TriangleMesh.get_volume(mesh)
+    area = 0
+    vertices = np.asarray(mesh.vertices) 
+    faces = np.asarray(mesh.triangles)
+    for face in faces:
+        a = face[0]
+        b = face[1]
+        c = face[2]
+        area += np.dot(np.cross(vertices[a], vertices[b]), vertices[c])/6
+    return area
 
 def aabb(mesh):
     return open3d.geometry.AxisAlignedBoundingBox.get_axis_aligned_bounding_box(mesh)
@@ -27,49 +48,14 @@ def diameter(mesh):
         ch_points.append(point)
     return diameter
 
-def pca(points, n):
-    mean_val = np.mean(points, axis=0)    # get mean of mesh's matrix
-    new_points = points - mean_val       # set the mesh on new origin
+def eccentricity(mesh):
+    points_df = pd.DataFrame(np.asarray(mesh.vertices))
+    pca = PCA(n_components=3)
+    pca.fit(points_df)
+    lambdas = pca.explained_variance_
+    return lambdas[0]/lambdas[2]
 
-    cov_np = np.cov(new_points, rowvar=0)    #calculate the covariance matrix
 
-    feature_val, feature_vect = np.linalg.eig(np.mat(cov_np))
-
-    feature_val_index = np.argsort(feature_val)
-    number_feature_val_index = feature_val_index[-1:-(n+1):-1]
-    number_feature_vect = feature_vect[:,number_feature_val_index]
-    lowD_martix = new_points * number_feature_vect
-    #rebuild_matrix = (lowD_martix * number_feature_vect.T) + mean_val
-
-    return [number_feature_vect, lowD_martix, new_points]
-
-"""
-Self-implemented surface area computing
-"""
-
-# def surface_area(vertices, faces):
-#     area = 0
-#     for face in faces:
-#         a = face[0]
-#         b = face[1]
-#         c = face[2]
-#         ba = vertices[b]-vertices[a]
-#         ca = vertices[c]-vertices[a]
-#         area += np.linalg.norm(np.cross(ba, ca))/2
-#     return area
-
-"""
-Self-implemented volume computing
-"""
-
-# def volume(vertices, faces):
-#     area = 0
-#     for face in faces:
-#         a = face[0]
-#         b = face[1]
-#         c = face[2]
-#         area += np.dot(np.cross(vertices[a], vertices[b]), vertices[c])/6
-#     return area
 
 def A1(points, n):
     l = points.shape[0]
@@ -151,4 +137,3 @@ def bin(sample, low, high, n):
     x = labels
     y = [count[i] for i in labels]
     plt.plot(x, y)
-

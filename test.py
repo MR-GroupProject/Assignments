@@ -1,4 +1,4 @@
-import features.features as ft
+import features as ft
 import matplotlib.pyplot as plt
 import matplotlib.transforms as mt
 import numpy as np
@@ -21,4 +21,4 @@ def diameter(mesh):
         ch_points.append(point)
     return diameter
     
-diameter(mesh)
+ft.eccentricity(mesh)
