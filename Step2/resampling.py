@@ -1,17 +1,7 @@
 from openpyxl import load_workbook
 import pymeshlab
 import os
-
-
-def re_mesh(bottom_face_num=10000, up_face_num=15000, ms=None):
-    if ms is not None:
-        loop_count = 1
-        while ms.current_mesh().face_number() < bottom_face_num and loop_count < 5:
-            ms.meshing_surface_subdivision_loop(loopweight='Loop', iterations=1, threshold=pymeshlab.Percentage(1.0))
-            loop_count += 1
-        if ms.current_mesh().face_number() > up_face_num:
-            ms.meshing_decimation_quadric_edge_collapse(targetfacenum=bottom_face_num, preservenormal=True,
-                                                        planarquadric=True)
+from tools import normalize
 
 
 def resampling(ws, ms, start_col=17):
@@ -24,7 +14,7 @@ def resampling(ws, ms, start_col=17):
             ms.load_new_mesh("../LabeledDB_new/" + label + "/" + file)
 
             if ws.cell(row, 4).value > 15000 or ws.cell(row, 4).value < 10000:
-                re_mesh(ms=ms)
+                normalize.re_mesh(ms=ms)
                 ws.cell(row, start_col).value = ms.current_mesh().vertex_number()
                 ws.cell(row, start_col + 1).value = ms.current_mesh().face_number()
                 print("done:" + file)
@@ -32,12 +22,7 @@ def resampling(ws, ms, start_col=17):
                 ws.cell(row, start_col).value = ws.cell(row, 3).value
                 ws.cell(row, start_col + 1).value = ws.cell(row, 4).value
 
-            ms.meshing_remove_duplicate_faces()
-            ms.meshing_remove_duplicate_vertices()
-            ms.meshing_remove_folded_faces()
-            ms.meshing_repair_non_manifold_edges()
-            ms.meshing_edge_flip_by_planar_optimization()
-            ms.meshing_close_holes()
+            normalize.clean_ms(ms)
             ms.save_current_mesh("../Remesh/" + label + "/" + file)
             ms.clear()
 

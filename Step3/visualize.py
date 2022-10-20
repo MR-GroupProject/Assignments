@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import matplotlib.transforms as mt
 import numpy as np
 import open3d
-from Tools import reader
+from tools import reader
 
 
 # import visualize as vz

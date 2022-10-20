@@ -1,10 +1,7 @@
-# import xlsxwriter module
-
-
 import xlsxwriter
 import os
 
-from Tools import convertor
+from tools import convertor
 
 # Workbook() takes one, non-optional, argument
 # which is the filename that we want to create.
@@ -71,5 +68,4 @@ for sub_fold in os.listdir(root_dir):
             print(file)
 
 # Finally, close the Excel file
-# via the close() method.
 workbook.close()
