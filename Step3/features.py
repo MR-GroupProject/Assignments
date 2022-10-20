@@ -145,3 +145,4 @@ def bin(sample, low, high, n):
     x = labels
     y = [count[i] for i in labels]
     plt.plot(x, y)
+    return y

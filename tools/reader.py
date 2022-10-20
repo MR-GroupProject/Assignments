@@ -15,7 +15,7 @@ def read_file(folder):
     d = os.path.join("../Remesh", folder)
     path_list = []
     for file in os.listdir(d):
-        off_path = "Remesh/" + folder + '/' + file
+        off_path = "../Remesh/" + folder + '/' + file
         path_list.append(off_path)
     return path_list
 

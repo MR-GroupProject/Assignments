@@ -64,8 +64,7 @@ def translation(ws, ms, start_col=12):
 
             ms.save_current_mesh("../Remesh/" + label + "/" + file)
             # flip test
-            flip_mesh = trimesh.load_mesh("../Remesh/" + label + "/" + file)
-            flip_label = normalize.flip(flip_mesh)
+            flip_label = normalize.flip(ms, "../Remesh/" + label + "/" + file)
             if flip_label == 0:
                 ms.clear()
                 continue

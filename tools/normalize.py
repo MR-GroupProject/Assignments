@@ -37,8 +37,9 @@ def pca(ms):
     ms.set_matrix(transformmatrix=m)  # transform the mesh
 
 
-def flip(ms):
-    tri_center = ms.triangles_center
+def flip(ms, file_path):
+    flip_mesh = trimesh.load_mesh(file_path)
+    tri_center = flip_mesh.triangles_center
     f0, f1, f2 = 0, 0, 0
 
     for point in tri_center:
