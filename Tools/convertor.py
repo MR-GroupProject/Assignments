@@ -1,5 +1,6 @@
 import os
 
+
 def convert_ply_into_off(input_file):
     f_name = os.path.splitext(input_file)[0]
     print(f_name)

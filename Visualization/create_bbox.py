@@ -5,7 +5,7 @@ import polyscope as ps
 
 def creat_bounding_box_file(bbox_max, bbox_min, dim_x, dim_y, dim_z):
 
-    f = open('bounding_box.off', 'w')
+    f = open('../bounding_box.off', 'w')
     f.write('OFF\n')
     f.write('8 6 0\n')
     # 4 lower vertexs

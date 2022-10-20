@@ -23,6 +23,9 @@ wheels/
 pip-wheel-metadata/
 share/python-wheels/
 *.egg-info/
+Remesh/
+.polyscope.ini
+imgui.ini
 .installed.cfg
 *.egg
 MANIFEST

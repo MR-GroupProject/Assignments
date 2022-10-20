@@ -4,7 +4,7 @@
 import xlsxwriter
 import os
 
-import convertor
+from Tools import convertor
 
 # Workbook() takes one, non-optional, argument
 # which is the filename that we want to create.

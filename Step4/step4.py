@@ -8,10 +8,10 @@ import transform
 from scipy.spatial import distance
 from scipy.stats import wasserstein_distance
 
-import reader
+from Tools import reader
 
 sys.path.append("..")
-import features as ft
+from Step3 import features as ft
 
 query_path = '../LabeledDB_new/Airplane/61.off'
 ms = pymeshlab.MeshSet()

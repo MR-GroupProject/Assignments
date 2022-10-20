@@ -1,9 +1,6 @@
 import features as ft
-import matplotlib.pyplot as plt
-import matplotlib.transforms as mt
 import numpy as np
 import open3d
-import reader
 
 mesh = open3d.io.read_triangle_mesh(("./LabeledDB_new/Airplane/72.off"))
 

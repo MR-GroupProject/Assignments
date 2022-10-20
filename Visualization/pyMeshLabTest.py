@@ -1,9 +1,7 @@
-import numpy as np
 import pymeshlab
-import os
 import polyscope as ps
 
-import create_bbox
+from Visualization import create_bbox
 import PCA
 
 # Polyscope initialized
