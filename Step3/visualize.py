@@ -35,7 +35,7 @@ def boxplot(data, range, title, xlabel='', ylabel='', show=False, save=''):
 
 
 def shape_descriptor():
-    obj_types = reader.read_subfold()
+    obj_types = reader.read_sub_fold()
 
     surface_areas = []
     volumes = []
@@ -68,7 +68,7 @@ def shape_descriptor():
 
 
 def shape_property():
-    obj_types = reader.read_subfold()
+    obj_types = reader.read_sub_fold()
 
     for obj_type in obj_types:
         file_paths = reader.read_file(obj_type)
@@ -123,7 +123,7 @@ def shape_property():
 
 
 def shape_property_grouped():
-    obj_types = reader.read_subfold()
+    obj_types = reader.read_sub_fold()
     matplotlib.rcParams['xtick.labelsize'] = 30
     matplotlib.rcParams['ytick.labelsize'] = 30
     title = ['A3', 'D1', 'D2', 'D3', 'D4']

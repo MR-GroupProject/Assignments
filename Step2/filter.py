@@ -1,24 +1,11 @@
 import xlsxwriter
 import os
-
+from tools import dataset
 from tools import convertor
 
-# Workbook() takes one, non-optional, argument
-# which is the filename that we want to create.
-workbook = xlsxwriter.Workbook('../filter.xlsx')
 
-# The workbook object is then used to add new
-# worksheet via the add_worksheet() method.
-worksheet = workbook.add_worksheet()
-
-# Use the worksheet object to write
-# data via the write() method.
-worksheet.write('A1', 'Name')
-worksheet.write('B1', 'Class')
-worksheet.write('C1', 'Vertices')
-worksheet.write('D1', 'Faces')
-worksheet.write('E1', 'Type of Faces')
-
+head = ['Name', 'Class', 'Vertices', 'Faces', 'Type of faces']
+workbook, worksheet = dataset.create_table('../test.xlsx', head=head)
 
 root_dir = '../LabeledDB_new'
 row = 1

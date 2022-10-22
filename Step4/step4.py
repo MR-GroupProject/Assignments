@@ -45,7 +45,7 @@ print(qef)
 
 
 def shape_descriptor():
-    obj_types = reader.read_subfold()
+    obj_types = reader.read_sub_fold()
 
     EXT_features = []
     EXT_path = []

@@ -7,7 +7,7 @@ import os
 # file_path = open("file_path.txt", 'w')
 # file_path_json = open("file_path_json.txt", 'w')
 
-def read_subfold():
+def read_sub_fold():
     return os.listdir("../Remesh")
 
 
