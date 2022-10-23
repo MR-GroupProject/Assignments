@@ -28,6 +28,7 @@ def bbox_scaling(ws, ms, start_col=6):
             ws.cell(row, start_col + 4).value = ms.current_mesh().bounding_box().dim_y()
             ws.cell(row, start_col + 5).value = ms.current_mesh().bounding_box().dim_z()
             ms.save_current_mesh("../Remesh/" + label + "/" + file)
+            # print("done: " + label)
             ms.clear()
 
 
@@ -79,5 +80,5 @@ sheet = wb['Sheet1']
 mesh_set = pymeshlab.MeshSet()
 
 translation(sheet, mesh_set)
-#bbox_scaling(sheet, mesh_set)
+bbox_scaling(sheet, mesh_set)
 wb.save('../filter.xlsx')
