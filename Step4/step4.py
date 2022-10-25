@@ -1,19 +1,15 @@
-import sys
-
 import numpy as np
 import open3d
 import pymeshlab
-import trimesh
 from scipy.spatial import distance
 from scipy.stats import wasserstein_distance
 
-from tools import reader
+from tools import dataset
 from tools import normalize
-
-sys.path.append("..")
 from Step3 import features as ft
 
-query_path = '../LabeledDB_new/Airplane/61.off'
+query_path = '../LabeledDB_new/Ant/82.off'
+tmp_save = './query remesh.off'
 ms = pymeshlab.MeshSet()
 ms.load_new_mesh(query_path)
 
@@ -24,27 +20,18 @@ center = ms.get_geometric_measures().get('barycenter')
 ms.compute_matrix_from_translation(traslmethod=3, neworigin=center)
 # alignment
 normalize.pca(ms)
-ms.save_current_mesh('query remesh.off')
+ms.save_current_mesh(tmp_save)
 # flip
-normalize.flip(ms, 'query remesh.off')
+normalize.flip(ms, tmp_save)
+# scaling
+ms.compute_matrix_from_scaling_or_normalization(unitflag=True)
+ms.save_current_mesh(tmp_save)
 
-ms.save_current_mesh('query remesh.off')
-
-query_mesh = open3d.io.read_triangle_mesh('./query remesh.off')
-
-qef = []
-qs = ft.surface_area(query_mesh)
-qv = ft.volume(query_mesh)
-qd = ft.diameter(query_mesh)
-qe = ft.eccentricity(query_mesh)
-points = np.asarray(query_mesh.vertices)
-a3 = ft.bin(ft.A3(points, 5000), 0, 1, 20)
-qef.extend([qs, qv, qd, qe])
-qef.extend(a3)
-print(qef)
+query_mesh = open3d.io.read_triangle_mesh(tmp_save)
+qef = ft.get_feature(tmp_save)
 
 
-def shape_descriptor():
+'''def shape_descriptor():
     obj_types = reader.read_sub_fold()
 
     EXT_features = []
@@ -79,48 +66,72 @@ def shape_descriptor():
 
             i += 1
         j+=1
-    return EXT_features, EXT_path
+    return EXT_features, EXT_path'''
 
 
 def euc(a, b):
     a = np.array(a)
     b = np.array(b)
-    return (np.linalg.norm(a - b))
+    return np.linalg.norm(a - b)
 
 
 def co(a, b):
-    return (1 - distance.cosine(a, b))
+    return distance.cosine(a, b)
 
 
 def EMD(a, b):
-    return (wasserstein_distance(a, b))
+    t = np.array(range(10))
+    return wasserstein_distance(t, t, a, b)
 
 
 def compare_feature(query_feature, database, threshold=100):
     result = []
-    index = []
+    indexes = []
     dic = {}
-    i = 0
+    index = 0
     for data in database:
-        dis = EMD(query_feature, data)
-        dic.update({dis: i})
-        if dis < threshold:
-            index.append(i)
-        result.append(dis)
-        i += 1
+        dist = EMD(query_feature, data)
+        dic.update({dist: index})
+        if dist < threshold:
+            indexes.append(index)
+        result.append(dist)
+        index += 1
     # print(result)
 
-    return index, result, dic
+    return indexes, result, dic
 
 
-database_features, database_index = shape_descriptor()
+'''database_features, database_index = shape_descriptor()
 print(database_features)
-print(database_index)
-result_i, result_d, dic = compare_feature(qef, database_features, threshold=2)
-result_d.sort()
-for i in range(8):
-    print(database_index[dic[result_d[i]]])
+print(database_index)'''
 
-print('..')
-for i in result_i:
-    print(database_index[i])
+
+all_features = dataset.get_all_data('../feature_data_normed.xlsx')
+database_filepath = np.asarray(all_features)[:, -1:]
+database_features = np.asarray(all_features)[:, :-1].astype(float)
+# normed_features = database_features[:, :5]
+# normed_features = normalize.standardization(normed_features)
+# database_features[:, :5] = normed_features
+# qef = np.asarray(qef)[5:]
+'''result_i, result_d, dic = compare_feature(qef, database_features, threshold=2)
+result_d.sort()
+for i in range(11):
+    print(database_filepath[dic[result_d[i]]])'''
+
+distance_results = []
+for i in range(5):
+    d = database_features[:, (i*10+5):(i*10+15)]
+    d_q = np.asarray(qef)[(i*10+5):(i*10+15)]
+    result_i, result_d, dic = compare_feature(d_q, d, threshold=2)
+    distance_results.append(result_d)
+    print('..')
+    result_d.sort()
+    for i in range(11):
+        print(database_filepath[dic[result_d[i]]])
+
+
+
+
+
+'''for i in result_i:
+    print(database_filepath[i])'''

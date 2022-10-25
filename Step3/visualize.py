@@ -130,29 +130,31 @@ def shape_property_grouped():
     for i in range(5):
         fig = plt.figure(figsize=(40, 40))
         j = 1
-        if i==0:
-            break
+        if i < 4:
+            continue
+
         for obj_type in obj_types:
+            plt.subplot(5, 4, j)
+            plt.ylim(0, 0.8)
             file_paths = reader.read_file(obj_type)
             print(j)
             for obj in file_paths:
                 mesh = open3d.io.read_triangle_mesh(obj)
                 points = np.asarray(mesh.vertices)
-                plt.subplot(5, 4, j)
                 if i == 0:
-                    ft.bin(ft.A3(points, 5000), 0, 1, 20)
+                    x, y = ft.bin(ft.A3(points, 3000), 0, 1, 15)
                 elif i == 1:
-                    ft.bin(ft.D1(points, 5000), 0, 1, 20)
+                    x, y = ft.bin(ft.D1(points, 1000), 0, 1, 15)
                 elif i == 2:
-                    ft.bin(ft.D2(points, 5000), 0, 1, 20)
+                    x, y = ft.bin(ft.D2(points, 3000), 0, 1, 15)
                 elif i == 3:
-                    ft.bin(ft.D3(points, 5000), 0, 1, 20)
+                    x, y = ft.bin(ft.D3(points, 3000), 0, 1, 15)
                 else:
-                    ft.bin(ft.D4(points, 5000), 0, 1, 20)
+                    x, y = ft.bin(ft.D4(points, 3000), 0, 1, 15)
+                plt.plot(x, y)
             plt.title(title[i] + ' for group: ' + obj_type, fontsize=30, fontweight='semibold')
             j += 1
         plt.tight_layout()
         plt.subplots_adjust(hspace=0.2)
-        fig.savefig("Visualization/All_" + str(i) + ".pdf")
+        fig.savefig("../Visualization/normed_" + str(i) + ".pdf")
         plt.close()
-

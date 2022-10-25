@@ -3,6 +3,28 @@ import numpy as np
 import trimesh
 
 
+def normalization(data):
+    max_value = max(data)
+    new_list = []
+    for i in data:
+        new_list.append(round(i / max_value, 5))
+    return new_list
+
+
+def bin_normalization(data, n):
+    new_list = []
+    for i in data:
+        new_list.append(round(i / n, 5))
+    return new_list
+
+
+def standardization(data):
+    mean = np.mean(data, axis=0)
+    std = np.std(data, axis=0)
+    result = (data - mean) / std
+    return result
+
+
 def re_mesh(bottom_face_num=10000, up_face_num=15000, ms=None):
     if ms is not None:
         loop_count = 1
