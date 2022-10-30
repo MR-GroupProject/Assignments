@@ -1,3 +1,5 @@
+import pymeshlab
+import trimesh
 from sklearn.decomposition import PCA
 from tools import normalize
 import math
@@ -25,12 +27,6 @@ def surface_area(mesh):
     return mesh.get_surface_area()
 
 
-def compactness(mesh):
-    a = mesh.get_surface_area()
-    v = volume(mesh)
-    return pow(a, 3) / (36 * math.pi * pow(v, 2))
-
-
 def volume(mesh):
     area = 0
     vertices = np.asarray(mesh.vertices)
@@ -43,9 +39,15 @@ def volume(mesh):
     return area
 
 
+def compactness(mesh):
+    a = mesh.get_surface_area()
+    v = volume(mesh)
+    return pow(a, 3) / (36 * math.pi * pow(v, 2))
+
+
 def rectangularity(mesh):
     v = volume(mesh)
-    bbox = open3d.geometry.AxisAlignedBoundingBox.get_axis_aligned_bounding_box(mesh)
+    bbox = open3d.geometry.AxisAlignedBoundingBox.get_oriented_bounding_box(mesh)
     bbox_v = bbox.volume()
     return v / bbox_v
 
@@ -59,7 +61,7 @@ def diameter(mesh):
         point = points[i]
         for ch_point in ch_points:
             distance = np.linalg.norm(point - ch_point)
-            if (distance > diameter):
+            if distance > diameter:
                 diameter = distance
         ch_points.append(point)
     return diameter
@@ -87,10 +89,10 @@ def A3(points, n):
 
 def D1(points, n):
     sample = []
-
+    indexes = np.random.choice(points.shape[0], n, replace=False)
     for i in range(n):
-        index = np.random.randint(points.shape[0])
-        distance = np.linalg.norm(points[index])
+        # index = np.random.randint(points.shape[0])
+        distance = np.linalg.norm(points[indexes[i]])
         sample.append(distance)
     sample = normalize.normalization(sample)
     return sample
@@ -117,7 +119,7 @@ def D3(points, n):
         vec1 = points[index[1]] - points[index[0]]
         vec2 = points[index[2]] - points[index[0]]
         area = np.linalg.norm(abs(np.cross(vec1, vec2)) / 2)
-        sample.append(area)
+        sample.append(pow(area, 0.5))
     sample = normalize.normalization(sample)
     return sample
 
@@ -133,7 +135,8 @@ def D4(points, n):
         row2 = np.append(points[index[2]], 1)
         row3 = np.append(points[index[3]], 1)
         det = [row0, row1, row2, row3]
-        sample.append(abs(np.linalg.det(det)) / 6)
+        v = abs(np.linalg.det(det)) / 6
+        sample.append(pow(v, 1/3))
     sample = normalize.normalization(sample)
     return sample
 
@@ -154,7 +157,7 @@ def bin(sample, low, high, n):
     return x, y
 
 
-def get_feature(filepath):
+def get_feature(filepath, rand=1):
     mesh = open3d.io.read_triangle_mesh(filepath)
     data_features = []
     s = surface_area(mesh)
@@ -163,11 +166,11 @@ def get_feature(filepath):
     d = diameter(mesh)
     e = eccentricity(mesh)
     p = np.asarray(mesh.vertices)
-    x1, a3 = bin(A3(p, 3000), 0, 1, 10)
-    x2, d1 = bin(D1(p, 3000), 0, 1, 10)
-    x3, d2 = bin(D2(p, 3000), 0, 1, 10)
-    x4, d3 = bin(D3(p, 3000), 0, 1, 10)
-    x5, d4 = bin(D4(p, 3000), 0, 1, 10)
+    x1, a3 = bin(A3(p, 8000), 0, 1, 20)
+    x2, d1 = bin(D1(p, 3000), 0, 1, 20)
+    x3, d2 = bin(D2(p, 6000), 0, 1, 20)
+    x4, d3 = bin(D3(p, 8000), 0, 1, 20)
+    x5, d4 = bin(D4(p, 8000), 0, 1, 20)
 
     data_features.extend([s, c, v, d, e])
     data_features.extend(a3)

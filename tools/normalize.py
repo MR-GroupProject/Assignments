@@ -21,6 +21,8 @@ def bin_normalization(data, n):
 def standardization(data):
     mean = np.mean(data, axis=0)
     std = np.std(data, axis=0)
+    print(mean)
+    print(std)
     result = (data - mean) / std
     return result
 
@@ -89,4 +91,5 @@ def clean_ms(ms):
     ms.meshing_remove_folded_faces()
     ms.meshing_repair_non_manifold_edges()
     ms.meshing_edge_flip_by_planar_optimization()
+    ms.meshing_repair_non_manifold_edges()
     ms.meshing_close_holes()

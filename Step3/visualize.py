@@ -130,12 +130,10 @@ def shape_property_grouped():
     for i in range(5):
         fig = plt.figure(figsize=(40, 40))
         j = 1
-        if i < 4:
-            continue
 
         for obj_type in obj_types:
             plt.subplot(5, 4, j)
-            plt.ylim(0, 0.8)
+            plt.ylim(0, 0.5)
             file_paths = reader.read_file(obj_type)
             print(j)
             for obj in file_paths:
@@ -144,7 +142,7 @@ def shape_property_grouped():
                 if i == 0:
                     x, y = ft.bin(ft.A3(points, 3000), 0, 1, 15)
                 elif i == 1:
-                    x, y = ft.bin(ft.D1(points, 1000), 0, 1, 15)
+                    x, y = ft.bin(ft.D1(points, 3000), 0, 1, 15)
                 elif i == 2:
                     x, y = ft.bin(ft.D2(points, 3000), 0, 1, 15)
                 elif i == 3:
@@ -156,5 +154,5 @@ def shape_property_grouped():
             j += 1
         plt.tight_layout()
         plt.subplots_adjust(hspace=0.2)
-        fig.savefig("../Visualization/normed_" + str(i) + ".pdf")
+        fig.savefig("../Visualization/normed_test_" + str(i) + ".pdf")
         plt.close()
