@@ -21,8 +21,6 @@ def bin_normalization(data, n):
 def standardization(data):
     mean = np.mean(data, axis=0)
     std = np.std(data, axis=0)
-    print(mean)
-    print(std)
     result = (data - mean) / std
     return result
 
