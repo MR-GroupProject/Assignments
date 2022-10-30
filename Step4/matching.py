@@ -68,6 +68,7 @@ def get_cont_distance(query_path, database_features, database_filepath):
             break
         index += 1
     qef_const_feature = normed_features[index]
+    print(index)
     results = compare_feature(qef_const_feature, normed_features, method=1)
     return results
 
@@ -84,9 +85,9 @@ def get_hist_distance(query_features, database_features):
         if i == 0:
             a3_result = compare_feature(d_q, d, method=0)
         elif i == 1:
-            d1_result = compare_feature(d_q, d, method=1)
+            d1_result = compare_feature(d_q, d, method=0)
         if i == 2:
-            d2_result = compare_feature(d_q, d, method=1)
+            d2_result = compare_feature(d_q, d, method=0)
         if i == 3:
             d3_result = compare_feature(d_q, d, method=0)
         if i == 4:
@@ -95,7 +96,7 @@ def get_hist_distance(query_features, database_features):
     return a3_result, d1_result, d2_result, d3_result, d4_result
 
 
-def read_database(database='../feature_data_normed20bin.xlsx'):
+def read_database(database='../feature_data_modified_20bin.xlsx'):
     all_features = dataset.get_all_data(database)
     data_filepath = np.asarray(all_features)[:, -1:]
     data_features = np.asarray(all_features)[:, :-1].astype(float)
@@ -106,10 +107,10 @@ def match(query_path, k=10):
     database_filepath, database_features = read_database()
     qef = ft.get_feature(query_path)
 
-    const_dist_results = get_cont_distance(query_path, database_features, database_filepath)
-    distance_results = {}
     a3, d1, d2, d3, d4 = get_hist_distance(qef, database_features)
+    const_dist_results = get_cont_distance(query_path, database_features, database_filepath)
 
+    distance_results = {}
     for i in range(len(database_features)):
         # final_dis = a3[i] * 0.1 + d1[i] * 0.5 + d2[i] * 0.15 + d3[i] * 0.1 + d4[i] * 0.15
         # final_dis = final_dis * 0.85 + const_dist_results[i] * 0.15
@@ -164,3 +165,7 @@ for i in range(11):
     d = np.asarray(distance_all(i))
     dt = normalize.standardization(d.T)
     dist_data_row.append(dt)'''
+
+query_path = '../Remesh/Airplane/61.off'
+result_, classes_ = match(query_path)
+print(result_)
