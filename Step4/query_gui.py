@@ -10,15 +10,19 @@ import tkinter as tk
 import pymeshlab
 
 from Step4 import matching
+from Step4.matching import Matching
 
+#class Interface:
 
 root = '../Remesh'
 result_meshes = []
+match = []
 labels = []
 ps.init()
 
 
 def selectModel():
+    match.clear()
     result_meshes.clear()
     for label in labels:
         label.destroy()
@@ -28,10 +32,13 @@ def selectModel():
         filename = os.path.basename(filePath)
         classname = os.path.dirname(filePath)
         query_path = root + '/' + os.path.basename(classname) + '/' + filename
+        m = Matching(query_path)
+        match.append(m)
+        matches, classes, descriptors, distances = m.match()
 
-        matches, classes, descriptors, distances = matching.match(query_path)
         q_mesh = trimesh.load_mesh(filePath)
         ps.register_surface_mesh("query mesh", q_mesh.vertices, q_mesh.faces)
+
         head = [('Query mesh: ' + filename), 'Single-value descriptors', 'A3', 'D1', 'D2', 'D3', 'D4', 'Distance']
         for col in range(1, 9):
             if col < 3:
@@ -42,23 +49,22 @@ def selectModel():
             labels.append(l_head)
 
         for i in range(1, 11):
-            label = tk.Label(window, text=matches[i - 1], bg='grey', font=('Arial', 10), width=25, height=2)
+            match_file = os.path.basename(matches[i - 1])
+            match_class = os.path.basename(os.path.dirname(matches[i - 1]))
+            label = tk.Label(window, text=str(match_class + '/' + match_file), bg='grey', font=('Arial', 10), width=20, 
+                             height=2)
             label.grid(column=1, row=i, padx=10, pady=10)
-            l_dist = tk.Label(window, text=str(round(descriptors[i - 1][0], 3)), font=('Arial', 10), width=20, height=2)
-            l_dist.grid(column=2, row=i, padx=10, pady=10)
-            l_a3 = tk.Label(window, text=str(round(descriptors[i - 1][1], 3)), font=('Arial', 10), width=10, height=2)
-            l_a3.grid(column=3, row=i, padx=10, pady=10)
-            l_d1 = tk.Label(window, text=str(round(descriptors[i - 1][2], 3)), font=('Arial', 10), width=10, height=2)
-            l_d1.grid(column=4, row=i, padx=10, pady=10)
-            l_d2 = tk.Label(window, text=str(round(descriptors[i - 1][3], 3)), font=('Arial', 10), width=10, height=2)
-            l_d2.grid(column=5, row=i, padx=10, pady=10)
-            l_d3 = tk.Label(window, text=str(round(descriptors[i - 1][4], 3)), font=('Arial', 10), width=10, height=2)
-            l_d3.grid(column=6, row=i, padx=10, pady=10)
-            l_d4 = tk.Label(window, text=str(round(descriptors[i - 1][5], 3)), font=('Arial', 10), width=10, height=2)
-            l_d4.grid(column=7, row=i, padx=10, pady=10)
+            labels.append(label)
+
+            for j in range(2, 8):
+                l_dist = tk.Label(window, text=str(round(descriptors[i - 1][j - 2], 3)), font=('Arial', 10), width=20,
+                                  height=2)
+                l_dist.grid(column=j, row=i, padx=10, pady=10)
+                labels.append(l_dist)
 
             l_final_d = tk.Label(window, text=str(round(distances[i - 1], 3)), font=('Arial', 10), width=10, height=2)
             l_final_d.grid(column=8, row=i, padx=10, pady=10)
+            labels.append(l_final_d)
 
             mesh = trimesh.load_mesh(matches[i - 1])
             result_meshes.append(mesh)
@@ -71,27 +77,17 @@ def selectModel():
             button_view_each.bind("<Button-1>", get_button)
             button_view_each.grid(column=9, row=i, padx=10, pady=10)
             labels.append(button_view_each)
-            labels.append(label)
-            labels.append(l_dist)
-            labels.append(l_a3)
-            labels.append(l_d1)
-            labels.append(l_d2)
-            labels.append(l_d3)
-            labels.append(l_d4)
-            labels.append(l_final_d)
 
-        button_view = tk.Button(
-            master=window,
-            text="View",
-            command=lambda: show(q_mesh, enable=1),
-            height=2,
-            width=15)
+    button_debug = tk.Button(
+        master=window,
+        text="Debug",
+        command=debug,
+        height=2,
+        width=15)
 
-        button_view.grid(column=0, row=0, padx=10, pady=10)
-        labels.append(button_view)
-
+    button_debug.grid(column=0, row=0, padx=10, pady=10)
+    labels.append(button_debug)
     label_loading.grid_remove()
-    #  ms.show_polyscope()
 
 
 def get_button(event):
@@ -104,7 +100,44 @@ def show(mesh, enable=0):
         ps.get_surface_mesh('query mesh').set_enabled(False)
         ps.register_surface_mesh("result mesh", mesh.vertices, mesh.faces)
         ps.get_surface_mesh('result mesh').set_position([1.2, 0, 0])
+    else:
+        ps.get_surface_mesh('query mesh').set_enabled(True)
+        print(ps.get_surface_mesh('result mesh'))
     ps.show()
+
+
+def debug():
+    filePath = filedialog.askopenfilename(filetypes=[("Mesh", ("*.off", ".ply"))], initialdir=root)
+    m = match[0]
+    descriptors = []
+    if filePath != '' and filePath is not None:
+        filename = os.path.basename(filePath)
+        classname = os.path.dirname(filePath)
+        debug_path = root + '/' + os.path.basename(classname) + '/' + filename
+        chosen_f = np.asarray(m.get_feature_by_path(debug_path)).reshape(1, -1)
+        chosen_const_f = m.get_q_const_f(debug_path).reshape(1, -1)
+
+        const = m.get_const_distance(chosen_const_f)
+        a3, d1, d2, d3, d4 = m.get_hist_distance(chosen_f)
+        descriptors.extend(const)
+        descriptors.extend(a3)
+        descriptors.extend(d1)
+        descriptors.extend(d2)
+        descriptors.extend(d3)
+        descriptors.extend(d4)
+        descriptors.append(np.mean([const, a3, d1, d2, d3, d4]))
+
+        label = tk.Label(window, text=str('debug:' + os.path.basename(classname) + '/' + filename), bg='grey',
+                         font=('Arial', 10), width=20, height=2)
+        label.grid(column=1, row=11, padx=10, pady=10)
+        labels.append(label)
+
+        for col in range(2, 9):
+            l_dist = tk.Label(window, text=str(round(descriptors[col-2], 3)), font=('Arial', 10), width=20, height=2)
+            l_dist.grid(column=col, row=11, padx=10, pady=10)
+            labels.append(l_dist)
+
+
 
 
 window = tk.Tk()
