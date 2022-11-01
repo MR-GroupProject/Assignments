@@ -39,12 +39,10 @@ def compare_feature(query_feature, database, method=0, length=20):
     return distance_set
 
 
-'''
-get distances for one descriptor
-'''
-
-
 def get_single_distance(query_feature, database_features, start_col, end_col, method):
+    """
+    To get feature distances for one descriptor
+    """
     features = database_features[:, start_col:end_col]  # get data columns for the descriptor
     query = query_feature[:, start_col:end_col]
     query = query[0]
@@ -53,13 +51,11 @@ def get_single_distance(query_feature, database_features, start_col, end_col, me
     return results
 
 
-'''
-get distance for all single-value features: 
-[area, compactness, rectangularity, diameter, eccentricity]
-'''
-
-
 def get_cont_distance(query_path, database_features, database_filepath):
+    """
+    To get feature distance for all single-value descriptors:
+    [area, compactness, rectangularity, diameter, eccentricity]
+    """
     const_features = database_features[:, :5]  # get data columns for single-value features
     normed_features = normalize.standardization(const_features)
     index = 0
@@ -68,7 +64,6 @@ def get_cont_distance(query_path, database_features, database_filepath):
             break
         index += 1
     qef_const_feature = normed_features[index]
-    print(index)
     results = compare_feature(qef_const_feature, normed_features, method=1)
     return results
 
@@ -104,6 +99,14 @@ def read_database(database='../feature_data_modified_20bin.xlsx'):
 
 
 def match(query_path, k=10):
+    """
+    matching function
+    Returns:
+        files - the filepath of result meshes
+        class_result - the shape classification of result meshes
+        descriptors - the descriptors of result meshes
+        distances - the feature distances between query mesh and result meshes
+    """
     database_filepath, database_features = read_database()
     qef = ft.get_feature(query_path)
 
@@ -111,28 +114,34 @@ def match(query_path, k=10):
     const_dist_results = get_cont_distance(query_path, database_features, database_filepath)
 
     distance_results = {}
+    descriptors_results = {}
     for i in range(len(database_features)):
         # final_dis = a3[i] * 0.1 + d1[i] * 0.5 + d2[i] * 0.15 + d3[i] * 0.1 + d4[i] * 0.15
         # final_dis = final_dis * 0.85 + const_dist_results[i] * 0.15
-        final_dis = a3[i] + d1[i] + d2[i] + d3[i] + d4[i] + const_dist_results[i]
+        final_dis = np.mean(a3[i] + d1[i] + d2[i] + d3[i] + d4[i] + const_dist_results[i])
         distance_results.update({i: final_dis})
+        descriptors_results.update({i: [const_dist_results[i], a3[i], d1[i], d2[i], d3[i], d4[i]]})
 
     sorted_dis = sorted(distance_results.items(), key=lambda x: x[1])
-    result = []
+    files = []
     class_result = []
+    descriptors = []
+    distances = []
     for dis in sorted_dis:
         if k == 0:
             break
-        filepath = str(database_filepath[dis[0]])
-        if filepath != ('[\'' + query_path + '\']'):
-            result.append(filepath)
+        filepath = database_filepath[dis[0]]
+        if filepath[0] != query_path:
+            descriptors.append(descriptors_results.get(dis[0]))
+            distances.append(dis[1])
+            files.append(filepath[0])
             # print(filepath)
-            dir_path = os.path.dirname(filepath)
+            dir_path = os.path.dirname(filepath[0])
             class_result.append(os.path.basename(dir_path))
             # print(class_path)
             k -= 1
 
-    return result, class_result
+    return files, class_result, descriptors, distances
 
 
 def distance_all(descriptor=0):
@@ -165,7 +174,3 @@ for i in range(11):
     d = np.asarray(distance_all(i))
     dt = normalize.standardization(d.T)
     dist_data_row.append(dt)'''
-
-query_path = '../Remesh/Airplane/61.off'
-result_, classes_ = match(query_path)
-print(result_)
