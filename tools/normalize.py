@@ -21,8 +21,11 @@ def bin_normalization(data, n):
 def standardization(data):
     mean = np.mean(data, axis=0)
     std = np.std(data, axis=0)
+    if std.all() == 0:
+        return data
     result = (data - mean) / std
     return result
+
 
 
 def re_mesh(bottom_face_num=10000, up_face_num=15000, ms=None):

@@ -72,7 +72,9 @@ def eccentricity(mesh):
     pca = PCA(n_components=3)
     pca.fit(points_df)
     lambdas = pca.explained_variance_
-    return lambdas[0] / lambdas[2]
+    e_1 = lambdas[0] / lambdas[2]
+    e_2 = lambdas[1] / lambdas[2]
+    return e_1, e_2
 
 
 def A3(points, n):
@@ -157,22 +159,22 @@ def bin(sample, low, high, n):
     return x, y
 
 
-def get_feature(filepath, rand=1):
+def get_feature(filepath):
     mesh = open3d.io.read_triangle_mesh(filepath)
     data_features = []
     s = surface_area(mesh)
     c = compactness(mesh)
     v = rectangularity(mesh)
     d = diameter(mesh)
-    e = eccentricity(mesh)
+    e1, e2 = eccentricity(mesh)
     p = np.asarray(mesh.vertices)
-    x1, a3 = bin(A3(p, 8000), 0, 1, 20)
+    x1, a3 = bin(A3(p, 5000), 0, 1, 20)
     x2, d1 = bin(D1(p, 3000), 0, 1, 20)
-    x3, d2 = bin(D2(p, 6000), 0, 1, 20)
-    x4, d3 = bin(D3(p, 8000), 0, 1, 20)
-    x5, d4 = bin(D4(p, 8000), 0, 1, 20)
+    x3, d2 = bin(D2(p, 5000), 0, 1, 20)
+    x4, d3 = bin(D3(p, 5000), 0, 1, 20)
+    x5, d4 = bin(D4(p, 5000), 0, 1, 20)
 
-    data_features.extend([s, c, v, d, e])
+    data_features.extend([s, c, v, d, e1, e2])
     data_features.extend(a3)
     data_features.extend(d1)
     data_features.extend(d2)

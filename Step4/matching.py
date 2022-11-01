@@ -1,45 +1,146 @@
 import os
 import numpy as np
-from scipy.spatial import distance
-from scipy.stats import wasserstein_distance
 
 from tools import dataset, reader
+from tools import distance as dist
 from tools import normalize
 from Step3 import features as ft
 
 
-def euc(a, b):
-    a = np.array(a)
-    b = np.array(b)
-    return np.linalg.norm(a - b)
-
-
-def co(a, b):
-    return distance.cosine(a, b)
-
-
-def EMD(a, b, length):
-    t = np.array(range(length))
-    return wasserstein_distance(t, t, a, b)
-
-
 def compare_feature(query_feature, database, method=0, length=20):
     distance_set = []
-    dist = 0
+    d = 0
     for data in database:
         if method == 0:
-            dist = EMD(query_feature, data, length=length)
+            d = dist.EMD(query_feature, data, length=length)
         elif method == 1:
-            dist = euc(query_feature, data)
+            d = dist.euc(query_feature, data)
         elif method == 2:
-            dist = co(query_feature, data)
-        distance_set.append(dist)
-    # print(result)
-
+            d = dist.co(query_feature, data)
+        distance_set.append(d)
     return distance_set
 
 
-def get_single_distance(query_feature, database_features, start_col, end_col, method):
+class Matching:
+    def __init__(self, q_path, d_path='../feature_data_6_20bin.xlsx'):
+        self.q_path = q_path
+        self.d_path = d_path
+
+        all_features = dataset.get_all_data(self.d_path)
+        self.data_filepath = np.asarray(all_features)[:, -1:]
+        self.data_features = np.asarray(all_features)[:, :-1].astype(float)
+        self.d_const_f_std = self.get_d_const_f_standardize()
+
+        self.q_features = self.get_q_f()
+        self.q_cont_f = self.get_q_const_f(self.q_path)
+        self.q_hist_f = self.get_q_hist_f()
+
+    def get_d_const_f_standardize(self):
+        const_features = self.data_features[:, :6]  # get data columns for single-value features
+        normed_features = normalize.standardization(const_features)
+        return normed_features
+
+    def get_q_f(self):
+        return ft.get_feature(self.q_path)
+
+    def get_q_const_f(self, path):
+        index = 0
+        for p in self.data_filepath:
+            if p == path:
+                break
+            index += 1
+        return self.d_const_f_std[index]
+
+    def get_q_hist_f(self):
+        f = []
+        for i in range(6):
+            f.append(np.asarray(self.q_features)[(i * 20 + 6):(i * 20 + 26)])
+        return f
+
+    def get_hist_distance(self, d_f):
+        a3_result = []
+        d1_result = []
+        d2_result = []
+        d3_result = []
+        d4_result = []
+        for i in range(5):
+            d = d_f[:, (i * 20 + 6):(i * 20 + 26)]
+            d_q = self.q_hist_f[i]
+            if i == 0:
+                a3_result = compare_feature(d_q, d, method=0)
+            elif i == 1:
+                d1_result = compare_feature(d_q, d, method=0)
+            elif i == 2:
+                d2_result = compare_feature(d_q, d, method=0)
+            elif i == 3:
+                d3_result = compare_feature(d_q, d, method=0)
+            elif i == 4:
+                d4_result = compare_feature(d_q, d, method=0)
+
+        return a3_result, d1_result, d2_result, d3_result, d4_result
+
+    def get_const_distance(self, d_f):
+        """
+        To get feature distance for all single-value descriptors:
+        [area, compactness, rectangularity, diameter, eccentricity]
+        """
+        results = compare_feature(self.q_cont_f, d_f, method=1)
+        return results
+
+    def match(self, k=10):
+        """
+        matching function
+        Returns:
+            files - the filepath of result meshes
+            class_result - the shape classification of result meshes
+            descriptors - the descriptors of result meshes
+            distances - the feature distances between query mesh and result meshes
+        """
+        a3, d1, d2, d3, d4 = self.get_hist_distance(self.data_features)
+        const_dist = self.get_const_distance(self.d_const_f_std)
+        distance_results = {}
+        descriptors_results = {}
+        for i in range(len(self.data_features)):
+            # final_dis = a3[i] * 0.1 + d1[i] * 0.5 + d2[i] * 0.15 + d3[i] * 0.1 + d4[i] * 0.15
+            # final_dis = final_dis * 0.85 + const_dist_results[i] * 0.15
+            final_dis = (a3[i] + d1[i] + d2[i] + d3[i] + d4[i] + const_dist[i]) / 6
+            distance_results.update({i: final_dis})
+            descriptors_results.update({i: [const_dist[i], a3[i], d1[i], d2[i], d3[i], d4[i]]})
+
+        sorted_dis = sorted(distance_results.items(), key=lambda x: x[1])
+        files = []
+        class_result = []
+        descriptors = []
+        distances = []
+        for dis in sorted_dis:
+            if k == 0:
+                break
+            filepath = self.data_filepath[dis[0]]
+            if filepath[0] != self.q_path:
+                descriptors.append(descriptors_results.get(dis[0]))
+                distances.append(dis[1])
+                files.append(filepath[0])
+                dir_path = os.path.dirname(filepath[0])
+                class_result.append(os.path.basename(dir_path))
+                k -= 1
+
+        return files, class_result, descriptors, distances
+
+    def get_feature_by_path(self, path):
+        get = False
+        i = 0
+        for p in self.data_filepath:
+            if p == path:
+                get = True
+                break
+            i += 1
+        if not get:
+            return None
+        else:
+            return self.data_features[i]
+
+
+'''def get_single_distance(query_feature, database_features, start_col, end_col, method):
     """
     To get feature distances for one descriptor
     """
@@ -49,99 +150,6 @@ def get_single_distance(query_feature, database_features, start_col, end_col, me
 
     results = compare_feature(query, features, method=method)
     return results
-
-
-def get_cont_distance(query_path, database_features, database_filepath):
-    """
-    To get feature distance for all single-value descriptors:
-    [area, compactness, rectangularity, diameter, eccentricity]
-    """
-    const_features = database_features[:, :5]  # get data columns for single-value features
-    normed_features = normalize.standardization(const_features)
-    index = 0
-    for path in database_filepath:
-        if path == query_path:
-            break
-        index += 1
-    qef_const_feature = normed_features[index]
-    results = compare_feature(qef_const_feature, normed_features, method=1)
-    return results
-
-
-def get_hist_distance(query_features, database_features):
-    a3_result = []
-    d1_result = []
-    d2_result = []
-    d3_result = []
-    d4_result = []
-    for i in range(5):
-        d = database_features[:, (i * 20 + 5):(i * 20 + 25)]
-        d_q = np.asarray(query_features)[(i * 20 + 5):(i * 20 + 25)]
-        if i == 0:
-            a3_result = compare_feature(d_q, d, method=0)
-        elif i == 1:
-            d1_result = compare_feature(d_q, d, method=0)
-        if i == 2:
-            d2_result = compare_feature(d_q, d, method=0)
-        if i == 3:
-            d3_result = compare_feature(d_q, d, method=0)
-        if i == 4:
-            d4_result = compare_feature(d_q, d, method=0)
-
-    return a3_result, d1_result, d2_result, d3_result, d4_result
-
-
-def read_database(database='../feature_data_modified_20bin.xlsx'):
-    all_features = dataset.get_all_data(database)
-    data_filepath = np.asarray(all_features)[:, -1:]
-    data_features = np.asarray(all_features)[:, :-1].astype(float)
-    return data_filepath, data_features
-
-
-def match(query_path, k=10):
-    """
-    matching function
-    Returns:
-        files - the filepath of result meshes
-        class_result - the shape classification of result meshes
-        descriptors - the descriptors of result meshes
-        distances - the feature distances between query mesh and result meshes
-    """
-    database_filepath, database_features = read_database()
-    qef = ft.get_feature(query_path)
-
-    a3, d1, d2, d3, d4 = get_hist_distance(qef, database_features)
-    const_dist_results = get_cont_distance(query_path, database_features, database_filepath)
-
-    distance_results = {}
-    descriptors_results = {}
-    for i in range(len(database_features)):
-        # final_dis = a3[i] * 0.1 + d1[i] * 0.5 + d2[i] * 0.15 + d3[i] * 0.1 + d4[i] * 0.15
-        # final_dis = final_dis * 0.85 + const_dist_results[i] * 0.15
-        final_dis = np.mean(a3[i] + d1[i] + d2[i] + d3[i] + d4[i] + const_dist_results[i])
-        distance_results.update({i: final_dis})
-        descriptors_results.update({i: [const_dist_results[i], a3[i], d1[i], d2[i], d3[i], d4[i]]})
-
-    sorted_dis = sorted(distance_results.items(), key=lambda x: x[1])
-    files = []
-    class_result = []
-    descriptors = []
-    distances = []
-    for dis in sorted_dis:
-        if k == 0:
-            break
-        filepath = database_filepath[dis[0]]
-        if filepath[0] != query_path:
-            descriptors.append(descriptors_results.get(dis[0]))
-            distances.append(dis[1])
-            files.append(filepath[0])
-            # print(filepath)
-            dir_path = os.path.dirname(filepath[0])
-            class_result.append(os.path.basename(dir_path))
-            # print(class_path)
-            k -= 1
-
-    return files, class_result, descriptors, distances
 
 
 def distance_all(descriptor=0):
@@ -165,7 +173,7 @@ def distance_all(descriptor=0):
         distances.extend(get_single_distance(database_features[i:i + 1, :], database_features[i + 1:, :],
                                              start, end, m))
 
-    return distances
+    return distances'''
 
 
 '''dist_data_row = []
