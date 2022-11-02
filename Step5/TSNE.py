@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 
 from sklearn.manifold import TSNE
 
+
 all_features = dataset.get_all_data('../feature_data_normed.xlsx')
 
 database_features = np.asarray(all_features)[:, :-1].astype(float)
@@ -24,10 +25,12 @@ for i in range (0, 19):
 
 plt.figure(figsize=(8,8))
 for i in range(x_norm.shape[0]):
-    plt.text(x_norm[i, 0], x_norm[i, 1], str(label[i]), color=plt.cm.Set1(label[i]), fontdict = {'weight': 'bold', 'size':9})
-
+    plt.text(x_norm[i, 0], x_norm[i, 1], str(label[i]), color=plt.cm.tab20c(label[i]), fontdict = {'weight': 'bold', 'size': 9})
 plt.xticks([])
 plt.yticks([])
+
+
+
 plt.show()
 
 
