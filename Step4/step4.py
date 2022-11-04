@@ -4,9 +4,9 @@ import pymeshlab
 from scipy.spatial import distance
 from scipy.stats import wasserstein_distance
 
+from step3 import features as ft
 from tools import dataset
 from tools import normalize
-from Step3 import features as ft
 
 query_path = '../LabeledDB_new/Ant/82.off'
 tmp_save = './query remesh.off'
