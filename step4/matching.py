@@ -4,7 +4,7 @@ import numpy as np
 from tools import dataset, reader
 from tools import distance as dist
 from tools import normalize
-from Step3 import features as ft
+from step3 import features as ft
 
 
 def compare_feature(query_feature, database, method=0, length=20):
@@ -45,11 +45,22 @@ class Matching:
 
     def get_q_const_f(self, path):
         index = 0
+        is_in_db = False  # whether the query mesh q is in database
+        # if the query mesh is from database, get single-value feature of q from the dataset directly
+        # if not, standardize q and database feature values
         for p in self.data_filepath:
             if p == path:
+                is_in_db = True
                 break
             index += 1
-        return self.d_const_f_std[index]
+        if is_in_db:
+            return self.d_const_f_std[index]
+        else:
+            const_f = self.data_features[:, :6]
+            q_f = np.asarray(self.q_features).reshape(1, -1)
+            const_f = np.append(const_f, q_f[:, :6], axis=0)
+            normed_f = normalize.standardization(const_f)
+            return normed_f[-1:, :]
 
     def get_q_hist_f(self):
         f = []
@@ -101,9 +112,9 @@ class Matching:
         distance_results = {}
         descriptors_results = {}
         for i in range(len(self.data_features)):
-            # final_dis = a3[i] * 0.1 + d1[i] * 0.5 + d2[i] * 0.15 + d3[i] * 0.1 + d4[i] * 0.15
-            # final_dis = final_dis * 0.85 + const_dist_results[i] * 0.15
-            final_dis = (a3[i] + d1[i] + d2[i] + d3[i] + d4[i] + const_dist[i]) / 6
+            final_dis = a3[i] * 0.15 + d1[i] * 0.15 + d2[i] * 0.4 + d3[i] * 0.15 + d4[i] * 0.15
+            final_dis = final_dis * 0.9 + const_dist[i] * 0.1
+            #final_dis = (a3[i] + d1[i] + d2[i] + d3[i] + d4[i] + const_dist[i]) / 6
             distance_results.update({i: final_dis})
             descriptors_results.update({i: [const_dist[i], a3[i], d1[i], d2[i], d3[i], d4[i]]})
 

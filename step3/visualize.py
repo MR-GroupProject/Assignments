@@ -1,4 +1,4 @@
-from Step3 import features as ft
+from step3 import features as ft
 import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib.transforms as mt

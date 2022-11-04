@@ -9,13 +9,14 @@ import numpy as np
 import tkinter as tk
 import pymeshlab
 
-from Step4 import matching
-from Step4.matching import Matching
+from step4 import matching
+from step4.matching import Matching
 
 #class Interface:
 
 root = '../Remesh'
 result_meshes = []
+debug_mesh = []
 match = []
 labels = []
 ps.init()
@@ -95,6 +96,10 @@ def get_button(event):
     show(result_meshes[button_row-1])
 
 
+def get_debug(event):
+    show(debug_mesh[0])
+
+
 def show(mesh, enable=0):
     if enable == 0:
         ps.get_surface_mesh('query mesh').set_enabled(False)
@@ -107,10 +112,12 @@ def show(mesh, enable=0):
 
 
 def debug():
+    debug_mesh.clear()
     filePath = filedialog.askopenfilename(filetypes=[("Mesh", ("*.off", ".ply"))], initialdir=root)
     m = match[0]
     descriptors = []
     if filePath != '' and filePath is not None:
+
         filename = os.path.basename(filePath)
         classname = os.path.dirname(filePath)
         debug_path = root + '/' + os.path.basename(classname) + '/' + filename
@@ -136,6 +143,18 @@ def debug():
             l_dist = tk.Label(window, text=str(round(descriptors[col-2], 3)), font=('Arial', 10), width=20, height=2)
             l_dist.grid(column=col, row=11, padx=10, pady=10)
             labels.append(l_dist)
+
+        mesh = trimesh.load_mesh(debug_path)
+        debug_mesh.append(mesh)
+
+        button_view_each = tk.Button(
+            master=window,
+            text="View",
+            height=2,
+            width=15)
+        button_view_each.bind("<Button-1>", get_debug)
+        button_view_each.grid(column=9, row=11, padx=10, pady=10)
+        labels.append(button_view_each)
 
 
 
