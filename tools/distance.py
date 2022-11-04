@@ -4,9 +4,7 @@ from scipy.stats import wasserstein_distance
 
 
 def euc(a, b):
-    a = np.array(a)
-    b = np.array(b)
-    return np.linalg.norm(a - b)
+    return distance.euclidean(a, b)
 
 
 def co(a, b):
