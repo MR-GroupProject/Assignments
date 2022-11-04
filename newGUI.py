@@ -3,7 +3,7 @@ Glooey widget example. Only runs with python>=3.6 (because of Glooey).
 """
 
 from cgitb import text
-from ctypes.wintypes import SIZE
+#from ctypes.wintypes import SIZE
 import io
 import pathlib
 

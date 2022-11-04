@@ -16,6 +16,13 @@ def acc(tp, tn):
     # ACC = (TP+TN) / (TP+FN+FP+TN) = (TP+TN) / d
     return (tp + tn) / 379
 
+def spec(tp, fn):
+    # Specificity = TP/(TP+FN)
+    return tp/(tp+fn)
+
+def sens(fp, tn):
+    # Sensitivity = TN/(FP+TN)
+    return tn/(fp+tn)
 
 def evaluate(d_f, k=10):
     result = []

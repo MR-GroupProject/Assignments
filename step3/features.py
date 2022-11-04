@@ -91,10 +91,9 @@ def A3(points, n):
 
 def D1(points, n):
     sample = []
-    indexes = np.random.choice(points.shape[0], n, replace=False)
     for i in range(n):
-        # index = np.random.randint(points.shape[0])
-        distance = np.linalg.norm(points[indexes[i]])
+        index = np.random.randint(points.shape[0])
+        distance = np.linalg.norm(points[index])
         sample.append(distance)
     sample = normalize.normalization(sample)
     return sample

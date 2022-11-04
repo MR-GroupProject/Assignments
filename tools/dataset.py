@@ -1,4 +1,3 @@
-import features as ft
 import xlsxwriter
 from openpyxl import load_workbook
 import os
