@@ -54,7 +54,7 @@ def selectModel():
             labels.append(label)
 
             for j in range(2, 8):
-                l_dist = tk.Label(window, text=str(round(descriptors[i - 1][j - 2], 3)), font=('Arial', 10), width=20,
+                l_dist = tk.Label(window, text=str(round(descriptors[i - 1][j - 2], 3)), font=('Arial', 10), width=5,
                                   height=2)
                 l_dist.grid(column=j, row=i, padx=10, pady=10)
                 labels.append(l_dist)
@@ -70,7 +70,7 @@ def selectModel():
                 master=window,
                 text="View",
                 height=2,
-                width=15)
+                width=10)
             button_view_each.bind("<Button-1>", get_button)
             button_view_each.grid(column=9, row=i, padx=10, pady=10)
             labels.append(button_view_each)
@@ -84,6 +84,15 @@ def selectModel():
 
     button_debug.grid(column=0, row=0, padx=10, pady=10)
     labels.append(button_debug)
+    button_ann = tk.Button(
+        master=window,
+        text="ANN",
+        command=ann,
+        height=2,
+        width=15)
+
+    button_ann.grid(column=0, row=1, padx=10, pady=10)
+    labels.append(button_ann)
     label_loading.grid_remove()
 
 
@@ -147,11 +156,25 @@ def debug():
             master=window,
             text="View",
             height=2,
-            width=15)
+            width=10)
         button_view_each.bind("<Button-1>", get_debug)
         button_view_each.grid(column=9, row=11, padx=10, pady=10)
         labels.append(button_view_each)
 
+
+def ann():
+    m = match[0]
+    matches = m.match_by_annoy()
+    l_head = tk.Label(window, text='ANN results', font=('Arial', 10), width=10, height=2)
+    l_head.grid(column=10, row=0, padx=10, pady=10)
+    labels.append(l_head)
+    for i in range(1, 11):
+        match_file = os.path.basename(matches[i - 1])
+        match_class = os.path.basename(os.path.dirname(matches[i - 1]))
+        label = tk.Label(window, text=str(match_class + '/' + match_file), bg='grey', font=('Arial', 10), width=20,
+                         height=2)
+        label.grid(column=10, row=i, padx=10, pady=10)
+        labels.append(label)
 
 
 
@@ -170,7 +193,7 @@ button_showModel = tk.Button(
     height=2,
     width=15)
 
-button_showModel.grid(column=0, row=1, padx=10, pady=10)
+button_showModel.grid(column=0, row=2, padx=10, pady=10)
 
 window.mainloop()
 

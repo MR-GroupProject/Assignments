@@ -1,5 +1,6 @@
 import os
 import numpy as np
+from annoy import AnnoyIndex
 
 from tools import dataset, reader
 from tools import distance as dist
@@ -136,6 +137,28 @@ class Matching:
                 k -= 1
 
         return files, class_result, descriptors, distances
+
+    def match_by_annoy(self, k=10, t=10):
+        tree = AnnoyIndex(len(self.q_features), 'euclidean')  # Length of item vector that will be indexed
+        i = 0
+        for f in self.data_features:
+            tree.add_item(i, f)
+            i += 1
+
+        tree.build(t)  # set number of trees
+        tree.save('annoy.ann')
+
+        u = AnnoyIndex(len(self.q_features), 'euclidean')
+        u.load('annoy.ann')  # fast, just mmap the file
+        index = u.get_nns_by_vector(self.q_features, k + 1)  # will find the k nearest neighbors
+        matches = []
+        found_self = False
+        for i in index:
+            if self.data_filepath[i][0] == self.q_path:
+                found_self = True
+                continue
+            matches.append(self.data_filepath[i][0])
+        return matches
 
     def get_feature_by_path(self, path):
         get = False
