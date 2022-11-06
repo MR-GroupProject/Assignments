@@ -4,9 +4,12 @@ import trimesh
 
 
 def normalization(data):
-    d_min, d_max = data.min(0), data.max(0)
-    norm = (data - d_min) / (d_max - d_min)
-    return norm
+    max_value = max(data)
+    min_value = min(data)
+    new_list = []
+    for i in data:
+        new_list.append(round((i - min_value) / (max_value - min_value), 5))
+    return new_list
 
 
 def bin_normalization(data, n):

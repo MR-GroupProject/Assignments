@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 
 from sklearn.manifold import TSNE
 
-all_features = dataset.get_all_data('../feature_data_6_20bin.xlsx')
+all_features = dataset.get_all_data('../feature_data_6_n_20bin.xlsx')
 
 database_features = np.asarray(all_features)[:, :-1].astype(float)
 const_features = database_features[:, :6]  # get data columns for single-value features
@@ -33,7 +33,7 @@ X = database_features
 # X_embedded = TSNE(n_components=2, learning_rate='auto', method='exact', early_exaggeration=8,
 #                  init='pca', metric=dist, perplexity=30, n_iter=1000, verbose=1).fit_transform(X)
 
-X_embedded = TSNE(n_components=2, learning_rate='auto', method='exact',
+X_embedded = TSNE(n_components=2, learning_rate=45, method='exact',
                   init='pca', metric=dist, perplexity=20, n_iter=1000).fit_transform(X)
 
 x_min, x_max = X_embedded.min(0), X_embedded.max(0)
@@ -48,7 +48,7 @@ plt.figure(figsize=(8, 8))
 # plt.xlim(-20, 20)
 # plt.ylim(-20, 20)
 for i in range(x_norm.shape[0]):
-    plt.text(x_norm[i, 0], x_norm[i, 1], str(label[i]), color=plt.cm.tab20c(label[i]),
+    plt.text(x_norm[i, 0], x_norm[i, 1], str(label[i]), color=plt.cm.tab20(label[i]),
              fontdict={'weight': 'bold', 'size': 9})
 '''plt.xticks([])
 plt.yticks([])'''

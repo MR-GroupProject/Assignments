@@ -3,19 +3,12 @@ from tkinter import filedialog, messagebox
 
 import trimesh
 import polyscope as ps
-from trimesh import viewer
 
 import numpy as np
 import tkinter as tk
-import pymeshlab
 
-# from step4 import matching
-# from step4.matching import Matching
-
-import matching
 from matching import Matching
 
-#class Interface:
 
 root = '../Remesh'
 result_meshes = []

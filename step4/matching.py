@@ -22,7 +22,7 @@ def compare_feature(query_feature, database, method=0, length=20):
 
 
 class Matching:
-    def __init__(self, q_path, d_path='../feature_data_6_20bin.xlsx'):
+    def __init__(self, q_path, d_path='../feature_data_6_n_20bin.xlsx'):
         self.q_path = q_path
         self.d_path = d_path
 
@@ -46,7 +46,7 @@ class Matching:
     def get_q_const_f(self, path):
         index = 0
         is_in_db = False  # whether the query mesh q is in database
-        # if the query mesh is from database, get single-value feature of q from the dataset directly
+        # if the query mesh is from database, get single-value features of q from the dataset directly
         # if not, standardize q and database feature values
         for p in self.data_filepath:
             if p == path:
@@ -112,9 +112,9 @@ class Matching:
         distance_results = {}
         descriptors_results = {}
         for i in range(len(self.data_features)):
-            final_dis = a3[i] * 0.15 + d1[i] * 0.15 + d2[i] * 0.4 + d3[i] * 0.15 + d4[i] * 0.15
-            final_dis = final_dis * 0.9 + const_dist[i] * 0.1
-            #final_dis = (a3[i] + d1[i] + d2[i] + d3[i] + d4[i] + const_dist[i]) / 6
+            #final_dis = a3[i] * 0.15 + d1[i] * 0.15 + d2[i] * 0.4 + d3[i] * 0.15 + d4[i] * 0.15
+            #final_dis = final_dis * 0.9 + const_dist[i] * 0.1
+            final_dis = (a3[i] + d1[i] + d2[i] + d3[i] + d4[i] + const_dist[i]) / 6
             distance_results.update({i: final_dis})
             descriptors_results.update({i: [const_dist[i], a3[i], d1[i], d2[i], d3[i], d4[i]]})
 

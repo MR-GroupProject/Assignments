@@ -19,7 +19,7 @@ def get_all_features():
     return features
 
 
-wb, ws = dataset.create_table('../feature_data_6_20bin.xlsx')
+wb, ws = dataset.create_table('../feature_data_6_n_20bin.xlsx')
 descriptors = get_all_features()
 dataset.write_data(descriptors, ws)
 wb.close()
