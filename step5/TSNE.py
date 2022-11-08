@@ -1,12 +1,16 @@
+import os.path
+import pandas as pd
 from tools import distance, reader
 from tools import dataset, normalize
 import numpy as np
 import matplotlib.pyplot as plt
-
+import plotly
+import plotly.express as px
 from sklearn.manifold import TSNE
 
 all_features = dataset.get_all_data('../feature_data_6_n_20bin.xlsx')
 database_features = np.asarray(all_features)[:, :-1].astype(float)
+database_filepaths = np.asarray(all_features)[:, -1:]
 const_features = database_features[:, :6]
 normed_features = normalize.standardization(const_features)
 database_features[:, :6] = normed_features
@@ -32,13 +36,14 @@ X_embedded = TSNE(n_components=2, learning_rate=500, method='exact', early_exagg
 # X_embedded = TSNE(n_components=2, learning_rate=45, method='exact',
 #                    init='pca', metric=dist, perplexity=20, n_iter=1000).fit_transform(database_features)
 
-# X_embedded = TSNE(n_components=2, learning_rate=45,
-#                   init='pca', metric='euclidean', perplexity=20, n_iter=1000).fit_transform(database_features)
+# X_embedded = TSNE(n_components=2, learning_rate=45, method='exact',
+#                  init='pca', metric='euclidean', perplexity=20, n_iter=1000).fit_transform(database_features)
 
 
 x_min, x_max = X_embedded.min(0), X_embedded.max(0)
 x_norm = (X_embedded - x_min) / (x_max - x_min)
 
+print(x_norm.shape)
 obj_types = reader.read_sub_fold()
 fig = plt.figure(figsize=(10, 8))
 for i in range(19):
@@ -49,3 +54,23 @@ plt.title("t-SNE DR Scatter Plot")
 fig.subplots_adjust(right=0.8)
 # plt.show()
 fig.savefig("../Visualization/tsne.pdf")
+
+label = []
+path = []
+for i in range(19):
+    clss = [obj_types[i] for j in range(20)]
+    label.extend(clss)
+
+for p in database_filepaths:
+    path.append(os.path.basename(p[0]))
+df = pd.DataFrame(x_norm, columns=['x', 'y'])
+df.insert(loc=0, column='class', value=np.asarray(label))
+df.insert(loc=0, column='filename', value=np.asarray(path))
+fig = px.scatter(data_frame=df, x='x', y='y', hover_name='class', hover_data=['filename'],
+                 color='class', color_discrete_sequence=px.colors.qualitative.Light24_r)
+
+fig.update_traces(marker={'size': 20})
+fig.update_traces(marker={'line_width': 0.5})
+# fig.show()
+plotly.offline.plot(fig, filename='../Visualization/tsne_plotly.html')
+# fig.write_image("../Visualization/tsne_p_euc.pdf")

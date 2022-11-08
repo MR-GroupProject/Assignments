@@ -139,7 +139,7 @@ def draw_roc():
     avg_ann_c_fpr = np.insert(avg_ann_c_fpr, 0, 0)
     a = auc(avg_c_fpr, avg_c_tpr)
     a1 = auc(avg_ann_c_fpr, avg_ann_c_tpr)
-    plt.plot(avg_c_fpr, avg_c_tpr, label='Custom(auc = %0.2f)' % a)
+    plt.plot(avg_c_fpr, avg_c_tpr, label='k-NN(auc = %0.2f)' % a)
     plt.plot(avg_ann_c_fpr, avg_ann_c_tpr, label='ANN(auc = %0.2f)' % a1)
     plt.title("Receiver Operating Characteristic")
     plt.legend()
@@ -165,4 +165,4 @@ dataset.write_data(f_ann, ws)
 wb.close()'''
 
 draw_roc()
-draw_roc_per_class()
+#draw_roc_per_class()
