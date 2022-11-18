@@ -1,11 +1,10 @@
-import xlsxwriter
 import os
 from tools import dataset
 from tools import convertor
 
 
 head = ['Name', 'Class', 'Vertices', 'Faces', 'Type of faces']
-workbook, worksheet = dataset.create_table('../test.xlsx', head=head)
+workbook, worksheet = dataset.create_table('../data/filter.xlsx', labels=head)
 
 root_dir = '../LabeledDB_new'
 row = 1

@@ -1,9 +1,6 @@
-import pymeshlab
-import trimesh
 from sklearn.decomposition import PCA
 from tools import normalize
 import math
-import matplotlib.pyplot as plt
 import numpy as np
 import open3d
 import pandas as pd
@@ -108,6 +105,7 @@ def D2(points, n):
         distance = np.linalg.norm(vec)
         sample.append(distance)
     sample = normalize.normalization(sample)
+    # sample = normalize.scale_normalization(sample, pow(2, 0.5))
     return sample
 
 
@@ -122,6 +120,7 @@ def D3(points, n):
         area = np.linalg.norm(abs(np.cross(vec1, vec2)) / 2)
         sample.append(pow(area, 0.5))
     sample = normalize.normalization(sample)
+    # sample = normalize.scale_normalization(sample, 0.7)
     return sample
 
 
@@ -139,10 +138,11 @@ def D4(points, n):
         v = abs(np.linalg.det(det)) / 6
         sample.append(pow(v, 1/3))
     sample = normalize.normalization(sample)
+    # sample = normalize.scale_normalization(sample, 0.4)
     return sample
 
 
-def bin(sample, low, high, n):
+def bin(sample, n, low=0, high=1):
     step = (high - low) / n
     bins = []
     for i in range(n):
@@ -167,11 +167,11 @@ def get_feature(filepath):
     d = diameter(mesh)
     e1, e2 = eccentricity(mesh)
     p = np.asarray(mesh.vertices)
-    x1, a3 = bin(A3(p, 5000), 0, 1, 20)
-    x2, d1 = bin(D1(p, 3000), 0, 1, 20)
-    x3, d2 = bin(D2(p, 5000), 0, 1, 20)
-    x4, d3 = bin(D3(p, 5000), 0, 1, 20)
-    x5, d4 = bin(D4(p, 5000), 0, 1, 20)
+    x1, a3 = bin(A3(p, 3000), 20)
+    x2, d1 = bin(D1(p, 3000), 20)
+    x3, d2 = bin(D2(p, 3000), 20)
+    x4, d3 = bin(D3(p, 3000), 20)
+    x5, d4 = bin(D4(p, 3000), 20)
 
     data_features.extend([s, c, v, d, e1, e2])
     data_features.extend(a3)

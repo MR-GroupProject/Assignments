@@ -1,13 +1,10 @@
 import os
-
 import numpy as np
-from tools import reader
-
-from step4.matching import Matching
 import matplotlib.pyplot as plt
-from sklearn.metrics import auc
-
+from tools import reader
 from tools import dataset
+from step4.matching import Matching
+from sklearn.metrics import auc
 
 
 def precision(tp, k=10):
@@ -82,8 +79,8 @@ def get_rate(matches, c):
 
 def draw_roc_per_class():
     # t, f = roc_auc()
-    t = dataset.get_all_data('../evaluation_t.xlsx')
-    f = dataset.get_all_data('../evaluation_f.xlsx')
+    t = dataset.get_all_data('../data/evaluation_t.xlsx')
+    f = dataset.get_all_data('../data/evaluation_f.xlsx')
     class_num = np.full((380, 189), 19)
     shape_num = np.full((380, 189), 360)
     t = t / class_num
@@ -109,14 +106,14 @@ def draw_roc_per_class():
 
     plt.legend()
     # plt.show()
-    fig.savefig("../Visualization/ROC.pdf")
+    fig.savefig("../visualization/roc/ROC.pdf")
 
 
 def draw_roc():
-    t = dataset.get_all_data('../evaluation_t.xlsx')
-    f = dataset.get_all_data('../evaluation_f.xlsx')
-    t_ann = dataset.get_all_data('../evaluation_t_ann.xlsx')
-    f_ann = dataset.get_all_data('../evaluation_f_ann.xlsx')
+    t = dataset.get_all_data('../data/evaluation_t.xlsx')
+    f = dataset.get_all_data('../data/evaluation_f.xlsx')
+    t_ann = dataset.get_all_data('../data/evaluation_t_ann.xlsx')
+    f_ann = dataset.get_all_data('../data/evaluation_f_ann.xlsx')
     class_num = np.full((380, 189), 19)
     shape_num = np.full((380, 189), 360)
     t = t / class_num
@@ -144,25 +141,26 @@ def draw_roc():
     plt.title("Receiver Operating Characteristic")
     plt.legend()
     # plt.show()
-    fig.savefig("../Visualization/ROC_all_ann.pdf")
+    fig.savefig("../visualization/roc/ROC_all_ann.pdf")
 
 
-# t, f, t_ann, f_ann = roc_auc()
-'''wb, ws = dataset.create_table('../evaluation_f.xlsx')
+# Store the tpr and fpr values in a sheet
+t, f, t_ann, f_ann = roc_auc()
+wb, ws = dataset.create_table('../data/evaluation_f.xlsx')
 dataset.write_data(f, ws)
 wb.close()
 
-wb, ws = dataset.create_table('../evaluation_t.xlsx')
+wb, ws = dataset.create_table('../data/evaluation_t.xlsx')
 dataset.write_data(t, ws)
 wb.close()
-'''
-'''wb, ws = dataset.create_table('../evaluation_t_ann.xlsx')
+
+wb, ws = dataset.create_table('../data/evaluation_t_ann.xlsx')
 dataset.write_data(t_ann, ws)
 wb.close()
 
-wb, ws = dataset.create_table('../evaluation_f_ann.xlsx')
+wb, ws = dataset.create_table('../data/evaluation_f_ann.xlsx')
 dataset.write_data(f_ann, ws)
-wb.close()'''
+wb.close()
 
 draw_roc()
 draw_roc_per_class()

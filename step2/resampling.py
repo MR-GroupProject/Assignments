@@ -27,7 +27,7 @@ def resampling(ws, ms, start_col=17):
             ms.clear()
 
 
-wb = load_workbook('../filter.xlsx')
+wb = load_workbook('../data/filter.xlsx')
 sheet = wb['Sheet1']
 mesh = pymeshlab.MeshSet()
 
@@ -35,9 +35,9 @@ mesh = pymeshlab.MeshSet()
 if not os.path.exists('../Remesh'):
     os.mkdir('../Remesh/')
 for r in range(2, sheet.max_row + 1):
-    label = sheet.cell(r, 2).value
-    if not os.path.exists('../Remesh/' + label):
-        os.mkdir('../Remesh/' + label)
+    l = sheet.cell(r, 2).value
+    if not os.path.exists('../Remesh/' + l):
+        os.mkdir('../Remesh/' + l)
 
 resampling(sheet, mesh)
-wb.save('../filter.xlsx')
+wb.save('../data/filter.xlsx')

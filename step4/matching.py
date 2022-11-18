@@ -2,7 +2,7 @@ import os
 import numpy as np
 from annoy import AnnoyIndex
 
-from tools import dataset, reader
+from tools import dataset
 from tools import distance as dist
 from tools import normalize
 from step3 import features as ft
@@ -23,7 +23,9 @@ def compare_feature(query_feature, database, method=0, length=20):
 
 
 class Matching:
-    def __init__(self, q_path, d_path='../feature_data_6_n_20bin.xlsx'):
+    def __init__(self, q_path, d_path='../data/feature_data_6_n_20bin.xlsx'):
+        self.descriptors_results = {}
+        self.distance_results = {}
         self.q_path = q_path
         self.d_path = d_path
 
@@ -96,7 +98,9 @@ class Matching:
         To get feature distance for all single-value descriptors:
         [area, compactness, rectangularity, diameter, eccentricity]
         """
-        results = compare_feature(self.q_cont_f, d_f, method=1)
+        results = []
+        for i in range(6):
+            results.append(compare_feature(self.q_cont_f[i], d_f[:, i], method=1))
         return results
 
     def match(self, k=10):
@@ -108,18 +112,27 @@ class Matching:
             descriptors - the descriptors of result meshes
             distances - the feature distances between query mesh and result meshes
         """
+        self.distance_results = {}
+        self.descriptors_results = {}
         a3, d1, d2, d3, d4 = self.get_hist_distance(self.data_features)
+        a3 = normalize.normalization(a3)
+        d1 = normalize.normalization(d1)
+        d2 = normalize.normalization(d2)
+        d3 = normalize.normalization(d3)
+        d4 = normalize.normalization(d4)
         const_dist = self.get_const_distance(self.d_const_f_std)
-        distance_results = {}
-        descriptors_results = {}
-        for i in range(len(self.data_features)):
-            #final_dis = a3[i] * 0.15 + d1[i] * 0.15 + d2[i] * 0.4 + d3[i] * 0.15 + d4[i] * 0.15
-            #final_dis = final_dis * 0.9 + const_dist[i] * 0.1
-            final_dis = (a3[i] + d1[i] + d2[i] + d3[i] + d4[i] + const_dist[i]) / 6
-            distance_results.update({i: final_dis})
-            descriptors_results.update({i: [const_dist[i], a3[i], d1[i], d2[i], d3[i], d4[i]]})
+        for i in range(6):
+            const_dist[i] = normalize.normalization(const_dist[i])
 
-        sorted_dis = sorted(distance_results.items(), key=lambda x: x[1])
+        for i in range(len(self.data_features)):
+            # final_dis = a3[i] * 0.15 + d1[i] * 0.15 + d2[i] * 0.4 + d3[i] * 0.15 + d4[i] * 0.15
+            # final_dis = final_dis * 0.9 + const_dist[i] * 0.1
+            final_dis = (a3[i] + d1[i] + d2[i] + d3[i] + d4[i] + const_dist[0][i] + const_dist[1][i] + const_dist[2][i]
+                         + const_dist[3][i] + const_dist[4][i] + const_dist[5][i]) / 11
+            self.distance_results.update({i: final_dis})
+            self.descriptors_results.update({i: [a3[i], d1[i], d2[i], d3[i], d4[i]]})
+
+        sorted_dis = sorted(self.distance_results.items(), key=lambda x: x[1])
         files = []
         class_result = []
         descriptors = []
@@ -129,7 +142,7 @@ class Matching:
                 break
             filepath = self.data_filepath[dis[0]]
             if filepath[0] != self.q_path:
-                descriptors.append(descriptors_results.get(dis[0]))
+                descriptors.append(self.descriptors_results.get(dis[0]))
                 distances.append(dis[1])
                 files.append(filepath[0])
                 dir_path = os.path.dirname(filepath[0])
@@ -152,10 +165,8 @@ class Matching:
         u.load('annoy.ann')  # fast, just mmap the file
         index = u.get_nns_by_vector(self.q_features, k + 1)  # will find the k nearest neighbors
         matches = []
-        found_self = False
         for i in index:
             if self.data_filepath[i][0] == self.q_path:
-                found_self = True
                 continue
             matches.append(self.data_filepath[i][0])
         return matches
@@ -173,46 +184,3 @@ class Matching:
         else:
             return self.data_features[i]
 
-
-'''def get_single_distance(query_feature, database_features, start_col, end_col, method):
-    """
-    To get feature distances for one descriptor
-    """
-    features = database_features[:, start_col:end_col]  # get data columns for the descriptor
-    query = query_feature[:, start_col:end_col]
-    query = query[0]
-
-    results = compare_feature(query, features, method=method)
-    return results
-
-
-def distance_all(descriptor=0):
-    database_filepath, database_features = read_database()
-    const_features = database_features[:, :5]
-    database_features[:, :5] = normalize.standardization(const_features)
-    distances = []
-    if descriptor < 5:
-        start = descriptor
-        end = start + 1
-        m = 1
-    elif descriptor == 10:
-        start = 0
-        end = start + 5
-        m = 1
-    else:
-        start = (descriptor - 5) * 20 + 5  # 5, 25, 45...
-        end = start + 20
-        m = 0
-    for i in range(len(database_features)):  # 380
-        distances.extend(get_single_distance(database_features[i:i + 1, :], database_features[i + 1:, :],
-                                             start, end, m))
-
-    return distances'''
-
-
-'''dist_data_row = []
-for i in range(11):
-#    print(min(distance_all(i)), max(distance_all(i)))
-    d = np.asarray(distance_all(i))
-    dt = normalize.standardization(d.T)
-    dist_data_row.append(dt)'''

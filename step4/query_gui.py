@@ -1,12 +1,8 @@
 import os
-from tkinter import filedialog, messagebox
-
 import trimesh
 import polyscope as ps
-
-import numpy as np
 import tkinter as tk
-
+from tkinter import filedialog
 from matching import Matching
 
 
@@ -36,8 +32,8 @@ def selectModel():
         q_mesh = trimesh.load_mesh(filePath)
         ps.register_surface_mesh("query mesh", q_mesh.vertices, q_mesh.faces)
 
-        head = [('Query mesh: ' + filename), 'Single-value descriptors', 'A3', 'D1', 'D2', 'D3', 'D4', 'Distance']
-        for col in range(1, 9):
+        head = [('Query mesh: ' + filename), 'A3', 'D1', 'D2', 'D3', 'D4', 'Distance']
+        for col in range(1, 8):
             if col < 3:
                 l_head = tk.Label(window, text=head[col - 1], font=('Arial', 10), width=20, height=2)
             else:
@@ -53,14 +49,14 @@ def selectModel():
             label.grid(column=1, row=i, padx=10, pady=10)
             labels.append(label)
 
-            for j in range(2, 8):
+            for j in range(2, 7):
                 l_dist = tk.Label(window, text=str(round(descriptors[i - 1][j - 2], 3)), font=('Arial', 10), width=5,
                                   height=2)
                 l_dist.grid(column=j, row=i, padx=10, pady=10)
                 labels.append(l_dist)
 
             l_final_d = tk.Label(window, text=str(round(distances[i - 1], 3)), font=('Arial', 10), width=10, height=2)
-            l_final_d.grid(column=8, row=i, padx=10, pady=10)
+            l_final_d.grid(column=7, row=i, padx=10, pady=10)
             labels.append(l_final_d)
 
             mesh = trimesh.load_mesh(matches[i - 1])
@@ -72,7 +68,7 @@ def selectModel():
                 height=2,
                 width=10)
             button_view_each.bind("<Button-1>", get_button)
-            button_view_each.grid(column=9, row=i, padx=10, pady=10)
+            button_view_each.grid(column=8, row=i, padx=10, pady=10)
             labels.append(button_view_each)
 
     button_debug = tk.Button(
@@ -82,7 +78,7 @@ def selectModel():
         height=2,
         width=15)
 
-    button_debug.grid(column=0, row=0, padx=10, pady=10)
+    button_debug.grid(column=0, row=2, padx=10, pady=10)
     labels.append(button_debug)
     button_ann = tk.Button(
         master=window,
@@ -126,26 +122,30 @@ def debug():
         filename = os.path.basename(filePath)
         classname = os.path.dirname(filePath)
         debug_path = root + '/' + os.path.basename(classname) + '/' + filename
-        chosen_f = np.asarray(m.get_feature_by_path(debug_path)).reshape(1, -1)
-        chosen_const_f = m.get_q_const_f(debug_path).reshape(1, -1)
+        # chosen_f = np.asarray(m.get_feature_by_path(debug_path)).reshape(1, -1)
+        # chosen_const_f = m.get_q_const_f(debug_path).reshape(1, -1)
 
-        const = m.get_const_distance(chosen_const_f)
-        a3, d1, d2, d3, d4 = m.get_hist_distance(chosen_f)
-        descriptors.extend(const)
-        descriptors.extend(a3)
-        descriptors.extend(d1)
-        descriptors.extend(d2)
-        descriptors.extend(d3)
-        descriptors.extend(d4)
-        descriptors.append(np.mean([const, a3, d1, d2, d3, d4]))
+        # const = m.get_const_distance(chosen_const_f)
+        # a3, d1, d2, d3, d4 = m.get_hist_distance(chosen_f)
+        # descriptors.extend(a3)
+        # descriptors.extend(d1)
+        # descriptors.extend(d2)
+        # descriptors.extend(d3)
+        # descriptors.extend(d4)
+        # descriptors.append(np.mean([const[0], const[1], const[2], const[3], const[4], const[5], a3, d1, d2, d3, d4]))
+        for i in range(len(m.data_filepath)):
+            if m.data_filepath[i][0] == debug_path:
+                descriptors = m.descriptors_results.get(i)
+                descriptors.append(m.distance_results.get(i))
+                break
 
         label = tk.Label(window, text=str('debug:' + os.path.basename(classname) + '/' + filename), bg='grey',
                          font=('Arial', 10), width=20, height=2)
         label.grid(column=1, row=11, padx=10, pady=10)
         labels.append(label)
 
-        for col in range(2, 9):
-            l_dist = tk.Label(window, text=str(round(descriptors[col-2], 3)), font=('Arial', 10), width=20, height=2)
+        for col in range(2, 8):
+            l_dist = tk.Label(window, text=str(round(descriptors[col-2], 3)), font=('Arial', 10), width=10, height=2)
             l_dist.grid(column=col, row=11, padx=10, pady=10)
             labels.append(l_dist)
 
@@ -158,7 +158,7 @@ def debug():
             height=2,
             width=10)
         button_view_each.bind("<Button-1>", get_debug)
-        button_view_each.grid(column=9, row=11, padx=10, pady=10)
+        button_view_each.grid(column=8, row=11, padx=10, pady=10)
         labels.append(button_view_each)
 
 
@@ -177,7 +177,6 @@ def ann():
         labels.append(label)
 
 
-
 window = tk.Tk()
 window.title("Multimedia Retrieval")
 
@@ -193,19 +192,7 @@ button_showModel = tk.Button(
     height=2,
     width=15)
 
-button_showModel.grid(column=0, row=2, padx=10, pady=10)
+button_showModel.grid(column=0, row=0, padx=10, pady=10)
 
 window.mainloop()
 
-'''for i in range(10):
-    ms.load_new_mesh(matches[i])
-    label = tk.Label(window, text=matches[i], bg='grey', font=('Arial', 10), width=20, height=2)
-    label.grid(column=1, row=i, padx=10, pady=10)
-    button_view = tk.Button(
-        master=window,
-        text="View",
-        command=show,
-        height=2,
-        width=15)
-
-    button_view.grid(column=3, row=i, padx=10, pady=10)'''

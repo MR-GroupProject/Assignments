@@ -1,6 +1,5 @@
 import xlsxwriter
 from openpyxl import load_workbook
-import os
 
 
 # create data sheet

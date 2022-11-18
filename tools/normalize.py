@@ -12,6 +12,13 @@ def normalization(data):
     return new_list
 
 
+def scale_normalization(data, s):
+    new_list = []
+    for i in data:
+        new_list.append(round(i / s, 5))
+    return new_list
+
+
 def bin_normalization(data, n):
     new_list = []
     for i in data:
@@ -26,7 +33,6 @@ def standardization(data):
         return data
     result = (data - mean) / std
     return result
-
 
 
 def re_mesh(bottom_face_num=10000, up_face_num=15000, ms=None):

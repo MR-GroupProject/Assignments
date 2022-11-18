@@ -1,7 +1,5 @@
 from openpyxl import load_workbook
-import numpy as np
 import pymeshlab
-import trimesh
 from tools import normalize
 
 
@@ -75,10 +73,10 @@ def translation(ws, ms, start_col=12):
                 ms.clear()
 
 
-wb = load_workbook('../filter.xlsx')
+wb = load_workbook('../data/filter.xlsx')
 sheet = wb['Sheet1']
 mesh_set = pymeshlab.MeshSet()
 
 translation(sheet, mesh_set)
 bbox_scaling(sheet, mesh_set)
-wb.save('../filter.xlsx')
+wb.save('../data/filter.xlsx')
