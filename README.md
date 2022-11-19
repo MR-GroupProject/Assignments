@@ -32,7 +32,7 @@ Step6 – evaluation
 
 Main part:  
 >1.	Pre-processing (execute only one time):   
->>a.	All files in step2. Sequence:   
+>>a.	All files in step2. Sequence: filter.py -> resampling.py -> transform.py   
 >>b.	Save_data.py in step3.  
 >2.	Query matching: execute query_gui.py in step4.
 
