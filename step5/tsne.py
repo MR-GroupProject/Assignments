@@ -46,7 +46,7 @@ plt.legend(bbox_to_anchor=(1.05, 0), loc=3, borderaxespad=0)
 plt.title("t-SNE DR Scatter Plot")
 fig.subplots_adjust(right=0.8)
 plt.show()
-fig.savefig("../visualization/tsne/tsne.pdf")
+fig.savefig("../Visualization/tsne/tsne.pdf")
 
 label = []
 path = []
@@ -65,5 +65,5 @@ fig = px.scatter(data_frame=df, x='x', y='y', hover_name='class', hover_data=['f
 fig.update_traces(marker={'size': 20})
 fig.update_traces(marker={'line_width': 0.5})
 # fig.show()
-plotly.offline.plot(fig, filename='../visualization/tsne_plotly.html')
-# fig.write_image("../visualization/tsne_p_euc.pdf")
+plotly.offline.plot(fig, filename='../Visualization/tsne_plotly.html')
+# fig.write_image("../Visualization/tsne_p_euc.pdf")

@@ -1,6 +1,6 @@
 import pymeshlab
 import polyscope as ps
-from visualization import create_bbox
+from Visualization import create_bbox
 
 # Polyscope initialized
 ps.init()

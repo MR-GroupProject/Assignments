@@ -34,7 +34,7 @@ def boxplot(data, ranges, title, xlabel='', ylabel='', show=False, save=''):
     if show:
         plt.show()
     if save != '':
-        plt.savefig("../visualization/elementary" + save)
+        plt.savefig("../Visualization/elementary" + save)
 
 
 def shape_descriptor():
@@ -104,7 +104,7 @@ def shape_property_grouped():
 
         plt.tight_layout()
         plt.subplots_adjust(wspace=0.12, hspace=0.2)
-        fig.savefig("../visualization/bins/bin_" + str(i) + ".pdf")
+        fig.savefig("../Visualization/bins/bin_" + str(i) + ".pdf")
         plt.close()
         break
 

@@ -106,7 +106,7 @@ def draw_roc_per_class():
 
     plt.legend()
     # plt.show()
-    fig.savefig("../visualization/roc/ROC.pdf")
+    fig.savefig("../Visualization/roc/ROC.pdf")
 
 
 def draw_roc():
@@ -141,7 +141,7 @@ def draw_roc():
     plt.title("Receiver Operating Characteristic")
     plt.legend()
     # plt.show()
-    fig.savefig("../visualization/roc/ROC_all_ann.pdf")
+    fig.savefig("../Visualization/roc/ROC_all_ann.pdf")
 
 
 # Store the tpr and fpr values in a sheet
