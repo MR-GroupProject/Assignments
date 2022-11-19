@@ -34,7 +34,7 @@ Main part:
 >1.	Pre-processing (execute only one time):   
 >>a.	All files in step2. Sequence: filter.py -> resampling.py -> transform.py   
 >>b.	Save_data.py in step3.  
->2.	Query matching: execute query_gui.py in step4.
+>2.	Query matching: execute query_gui.py in step4.  
 
 T-SNE:  
 >Execute t_sne.py in step5. (Make sure you have done the pre-processing before this step)  
